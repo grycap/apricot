@@ -1,0 +1,63 @@
+
+ 
+configure front(
+@begin
+---  
+  - ec3_prio: 10
+  - tasks:
+    - name: front apt install gpp in Deb system
+      apt: pkg=g++
+      when: ansible_os_family == "Debian"
+
+    - name: front apt install gfortran in Deb system
+      apt: pkg=gfortran
+      when: ansible_os_family == "Debian"
+
+    - name: front apt install cmake in Deb system
+      apt: pkg=cmake
+      when: ansible_os_family == "Debian"
+      
+    - name: front apt install gcc in RedHat system
+      yum: pkg=gcc-c++
+      when: ansible_os_family == "RedHat"
+      
+    - name: front apt install gfortranin RedHat system
+      yum: pkg=gcc-gfortran
+      when: ansible_os_family == "RedHat"
+      
+    - name: front apt install cmake in RedHat system
+      yum: pkg=cmake
+      when: ansible_os_family == "RedHat"      
+@end
+)
+
+configure wn(
+@begin
+---  
+  - ec3_prio: 10
+  - tasks:
+    - name: wn apt install gpp in Deb system
+      apt: pkg=g++
+      when: ansible_os_family == "Debian"
+
+    - name: wn apt install gfortran in Deb system
+      apt: pkg=gfortran
+      when: ansible_os_family == "Debian"
+
+    - name: wn apt install cmake in Deb system
+      apt: pkg=cmake
+      when: ansible_os_family == "Debian"
+      
+    - name: wn apt install gcc in RedHat system
+      yum: pkg=gcc-c++
+      when: ansible_os_family == "RedHat"
+      
+    - name: wn apt install gfortranin RedHat system
+      yum: pkg=gcc-gfortran
+      when: ansible_os_family == "RedHat"
+      
+    - name: wn apt install cmake in RedHat system
+      yum: pkg=cmake
+      when: ansible_os_family == "RedHat"      
+@end
+)
