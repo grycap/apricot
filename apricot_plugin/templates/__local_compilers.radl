@@ -1,9 +1,15 @@
 
+description local_compilers (
+    kind = 'component' and
+    short = 'utilities for compiling ' and
+    content = 'g++, gfortran, cmake'
+) 
+
  
 configure front(
 @begin
 ---  
-  - ec3_prio: 10
+  - ec3_prio: -1
   - tasks:
     - name: front apt install gpp in Deb system
       apt: pkg=g++
@@ -34,7 +40,7 @@ configure front(
 configure wn(
 @begin
 ---  
-  - ec3_prio: 10
+  - ec3_prio: -1
   - tasks:
     - name: wn apt install gpp in Deb system
       apt: pkg=g++
