@@ -1,0 +1,16 @@
+
+description local_onedata (
+    kind = 'component' and
+    short = 'install onedata client' and
+    content = 'one data client will be installed using: curl -sS  http://get.onedata.org/oneclient.sh | bash'
+) 
+
+configure front(
+@begin
+---
+    - ec3_prio: -20
+    - tasks:
+      - name: install onedata client
+        shell: curl -sS  http://get.onedata.org/oneclient.sh | bash
+@end
+)

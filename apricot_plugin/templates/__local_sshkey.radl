@@ -1,0 +1,25 @@
+
+description local_sshkey (
+    kind = 'component' and
+    short = 'Generate ssh key to use with nfs' and
+    content = 'ssh key on ~/.ssh/id_rsa and pub key ~/.ssh/id_rsa.pub. Pub key will be added to authorized keys file'
+) 
+
+configure front(
+@begin
+---
+  - ec3_prio: -1
+  - tasks:
+    - name: Generate key pair
+      shell: ssh-keygen -t rsa -f /home/__USER_NAME__/.ssh/id_rsa -N ""
+      
+    - name: Add public key to authorised keys
+      shell: cat /home/__USER_NAME__/.ssh/id_rsa.pub >> /home/__USER_NAME__/.ssh/authorized_keys
+      
+    - name: Change private key owner
+      shell: chown __USER_NAME__:__USER_NAME__ /home/__USER_NAME__/.ssh/id_rsa
+      
+    - name: Change public key owner
+      shell: chown __USER_NAME__:__USER_NAME__ /home/__USER_NAME__/.ssh/id_rsa.pub
+@end
+)

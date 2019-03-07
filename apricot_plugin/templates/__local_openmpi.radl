@@ -1,0 +1,80 @@
+
+configure front(
+@begin
+---
+  - ec3_prio: -2
+  - tasks:
+    - name: apt install openmpi-bin in Deb system
+      apt: pkg=openmpi-bin
+      when: ansible_os_family == "Debian"
+
+    - name: apt install openssh client in Deb system
+      apt: pkg=openssh-client
+      when: ansible_os_family == "Debian"
+
+    - name: apt install openssh server in Deb system
+      apt: pkg=openssh-server
+      when: ansible_os_family == "Debian"
+      
+    - name: apt install openmpi-dev client in Deb system
+      apt: pkg=libopenmpi-dev
+      when: ansible_os_family == "Debian"      
+      
+    - name: apt install openmpi in RedHat system
+      yum: pkg=openmpi
+      when: ansible_os_family == "RedHat"
+
+    - name: apt install openssh-clients in RedHat system
+      yum: pkg=openssh-clients
+      when: ansible_os_family == "RedHat"        
+
+    - name: apt install openssh-server in RedHat system
+      yum: pkg=openssh-server
+      when: ansible_os_family == "RedHat"        
+      
+    - name: apt install openmpi-devel in RedHat system
+      yum: pkg=openmpi-devel
+      when: ansible_os_family == "RedHat"
+      
+@end
+)
+
+configure wn(
+@begin
+---
+  - ec3_prio: -2
+  - tasks:
+    - name: apt install openmpi-bin in Deb system
+      apt: pkg=openmpi-bin
+      when: ansible_os_family == "Debian"
+
+    - name: apt install openssh client in Deb system
+      apt: pkg=openssh-client
+      when: ansible_os_family == "Debian"
+
+    - name: apt install openssh server in Deb system
+      apt: pkg=openssh-server
+      when: ansible_os_family == "Debian"
+      
+    - name: apt install openmpi-dev client in Deb system
+      apt: pkg=libopenmpi-dev
+      when: ansible_os_family == "Debian"      
+      
+    - name: apt install openmpi in RedHat system
+      yum: pkg=openmpi
+      when: ansible_os_family == "RedHat"
+
+    - name: apt install openssh-clients in RedHat system
+      yum: pkg=openssh-clients
+      when: ansible_os_family == "RedHat"        
+
+    - name: apt install openssh-server in RedHat system
+      yum: pkg=openssh-server
+      when: ansible_os_family == "RedHat"        
+      
+    - name: apt install openmpi-devel in RedHat system
+      yum: pkg=openmpi-devel
+      when: ansible_os_family == "RedHat"
+      
+@end
+)
