@@ -1,6 +1,0 @@
-Type: IPython Notebook Extension
-Name: Apricot
-Description: Automatize infrastructure deployment into jupyter notebooks
-Main: main.js
-Compatibility: 4.x, 5.x
-
