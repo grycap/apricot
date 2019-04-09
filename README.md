@@ -40,3 +40,4 @@ APRICOT has been constructed using the following components:
 - [**EC3**](https://servproject.i3m.upv.es/ec3/), an open-source tool to deploy compute clusters that can horizontally scale in terms of number of nodes with multiple plugins.
 - [**IM**](https://www.grycap.upv.es/im/index.php), an open-source virtual infrastructure provisioning tool for multi-Clouds.
 - [**ONEDATA**](https://github.com/grycap/clues), global data storage backed by computing centers and storage providers worldwide.
+
