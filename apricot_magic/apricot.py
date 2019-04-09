@@ -11,6 +11,7 @@ class Apricot(Magics):
     actualDir = ""
     oneDataToken = ""
     oneDataHost = ""
+    oneDataStore = "/opt/onedata_spaces/"
 
     #
     # Auxiliar functions
@@ -38,6 +39,7 @@ class Apricot(Magics):
         while(value <= top):
             localScript = script.replace(identifier,str(value))
             if(rangeID == 0):
+                #print(localScript)
                 command = "exec " + clustername + " sbatch << " + localScript
                 if self.apricot(command) != "done":
                     return "fail"
@@ -98,10 +100,32 @@ class Apricot(Magics):
         return runID
 
     @line_magic
+    def apricot_log(self, line):
+        if len(line) == 0:
+            print("usage: apricot_log clustername\n")
+            return "fail"
+
+        #Split line
+        words = self.splitClear(line)
+
+        #Get cluster name
+        clusterName = words[0]
+
+        #Get log
+        pipes = subprocess.Popen(["ec3","show","-r",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        
+        log, std_err = pipes.communicate()
+
+        print(log)
+
+        return "done"
+        
+
+    @line_magic
     def apricot_onedata(self,line):
         if len(line) == 0:
-            print("usage: corp_onedata clustername instruction parameters...\n")
-            print("Valid instructions are: mount, unmount, set-token, get-token, set-host, get-host")
+            print("usage: apricot_onedata clustername instruction parameters...\n")
+            print("Valid instructions are: mount, unmount, set-token, get-token, set-host, get-host, cp")
             return "fail"
 
         #Split line
@@ -132,18 +156,72 @@ class Apricot(Magics):
             if len(words) < 3:
                 print("No mount point specified")
                 return "fail"
-            if len(words) < 4:
-                return self.apricot("exec " + clusterName + " oneclient -H " + oneDataHost + " -t " + oneDataToken + " " + words[2])
-            if len(words) < 5:
-                return self.apricot("exec " + clusterName + " oneclient -H " + words[3] + " -t " + oneDataToken + " " + words[2])
+
+            #Create directory to mount specified space
+            if words[2][0] == '/':
+                mountPoint = words[2]                
             else:
-                return self.apricot("exec " + clusterName + " oneclient -H " + words[3] + " -t " + words[4] + " " + words[2])
+                mountPoint = self.oneDataStore + words[2]
+
+            self.apricot("exec " + clusterName + " rm -r " + mountPoint + "&> /dev/null")
+            status = self.apricot("exec " + clusterName + " mkdir " + mountPoint)
+            if status != "done":
+                print("Unable to create directory: " + mountPoint)
+                return "fail"
+                
+            
+            if len(words) < 4:
+                return self.apricot("exec " + clusterName + " oneclient -H " + oneDataHost + " -t " + oneDataToken + " " + mountPoint)
+            if len(words) < 5:
+                return self.apricot("exec " + clusterName + " oneclient -H " + words[3] + " -t " + oneDataToken + " " + mountPoint)
+            else:
+                return self.apricot("exec " + clusterName + " oneclient -H " + words[3] + " -t " + words[4] + " " + mountPoint)
 
         elif instruction == "unmount":
             if len(words) < 3:
                 print("No mount point specified")
                 return "fail"
             return self.apricot("exec " + clusterName + " oneclient -u " + words[3])
+
+        elif instruction == "cp":
+            if len(words) < 4:
+                print("usage: apricot_onedata clusterName cp onedataPath localPath")
+                return "fail"
+
+            if words[2][0] == '/':
+                origin = words[2]
+                absolutePath = True
+            else:
+                origin = self.oneDataStore + words[2]
+                absolutePath = False
+
+            destin = words[3]
+                
+            #Try to copy file from already mounted space
+            status = self.apricot("exec " + clusterName + " cp " + origin + " " + destin + " &> /dev/null")
+
+            if status != "done":
+
+                #Check if is an absolute path
+                if absolutePath == True:
+                    print("Unable to find absolute path: " + origin)
+                    return "fail"
+                
+                #Try to mount default space and then perform copy
+                print("File not found in mounted spaces, trying to mount default host")
+                status = self.apricot_onedata(clusterName + "mount __TEMP__SPACE_MOUNTPOINT__")
+                if status != "done":
+                    print("Unable to mount defualt host: " + oneDataHost)
+                    return "fail"
+
+                #Default space mounted, try to peform the copy
+                origin = self.oneDataStore + "__TEMP__SPACE_MOUNTPOINT__/" + words[2]
+                return self.apricot("exec " + clusterName + " cp " + origin + " " + destin)                
+            else:
+                return "done"
+            
+            return self.apricot("exec " + clusterName + " oneclient -u " + words[3])            
+        
         else:
             print("Unknown instruction")
             return "fail"
@@ -310,7 +388,7 @@ class Apricot(Magics):
                     continue
                 if word == "ssh":
                     scp_instruct.append("scp")
-                    scp_instruct.append("-r")                    
+                    scp_instruct.append("-r")
                     continue
 
                 if word == "-p":
@@ -350,7 +428,7 @@ class Apricot(Magics):
                 print( "Status: Fail " + str(pipes.returncode) + "\n")
                 print( std_err )
                 return "fail"                
-
+            
     @line_magic
     def apricot_download(self, line):
         if len(line) == 0:
