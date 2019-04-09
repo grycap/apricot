@@ -6,7 +6,7 @@ APRICOT is an open-source extension to support infrastructure deployment, manage
 
 ## Experiment replication methodology
 
-A generic computational experimentation involves the elements showed at figure \ref{fig:computexp}. So, to be able to reproduce any experiment, any researcher needs,
+A generic computational experimentation involves the elements showed at next figure. So, to be able to reproduce any experiment, any researcher needs,
 
  - Required input data or a method to produce it.
 
