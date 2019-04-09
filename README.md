@@ -18,7 +18,7 @@ A generic computational experimentation involves the elements showed at figure \
 
 ![Alt text](docs/images/experiment.png?raw=true "Title")
 
-Although in some experiments a simple computer fits the experiment requirements, lately more and more experiments needs a significant computer effort that requires a complex infrastructure. This infrastructure is usually obtained via private and public cloud providers, however, deploy and configuration steps can involve a significant effort by the researcher and advanced technical knowledge. To simplify this step in reproducible research field enter APRICOT. As we will see at next sections, APRICOT, using other components, satisfy all the requirements for develop reproducible experiments within a unique environment, Jupyter notebooks. The key points for develop reproducible experiments using APRICOT extensions are,
+APRICOT, using other components, satisfy all the requirements for develop reproducible experiments within a unique environment, Jupyter notebooks. The key points for develop reproducible experiments using APRICOT extensions are,
 
 
  - Required data must be provided using external storage systems or a notebook with instructions to create it. APRICOT has been configured to use OneData as external storage provider.
