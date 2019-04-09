@@ -11,7 +11,7 @@ configure front(
 ---  
   - ec3_prio: -1
   - tasks:
-    - name: front apt install gpp in Deb system
+    - name: front apt install g++ in Deb system
       apt: pkg=g++
       when: ansible_os_family == "Debian"
 
@@ -23,7 +23,7 @@ configure front(
       apt: pkg=cmake
       when: ansible_os_family == "Debian"
       
-    - name: front apt install gcc in RedHat system
+    - name: front apt install g++ in RedHat system
       yum: pkg=gcc-c++
       when: ansible_os_family == "RedHat"
       
@@ -42,7 +42,7 @@ configure wn(
 ---  
   - ec3_prio: -1
   - tasks:
-    - name: wn apt install gpp in Deb system
+    - name: wn apt install g++ in Deb system
       apt: pkg=g++
       when: ansible_os_family == "Debian"
 
@@ -54,7 +54,7 @@ configure wn(
       apt: pkg=cmake
       when: ansible_os_family == "Debian"
       
-    - name: wn apt install gcc in RedHat system
+    - name: wn apt install g++ in RedHat system
       yum: pkg=gcc-c++
       when: ansible_os_family == "RedHat"
       

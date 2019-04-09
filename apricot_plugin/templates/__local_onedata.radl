@@ -8,9 +8,16 @@ description local_onedata (
 configure front(
 @begin
 ---
-    - ec3_prio: -20
+    - ec3_prio: -2
     - tasks:
       - name: install onedata client
         shell: curl -sS  http://get.onedata.org/oneclient.sh | bash
+      - name: create /home/onedata as directory to mount spaces
+        file:
+            path: /opt/onedata_spaces
+            state: directory
+            group: __USER_NAME__
+            owner: __USER_NAME__
+       
 @end
 )
