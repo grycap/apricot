@@ -22,8 +22,8 @@ define([
     var prefix = "infrastructure-deployment";
     
     var queues = ["slurm"];
-    var applications = ["slurm","compilers","openmpi","NFSshared","docker","galaxy","nfs","hadoop","jupyter","spark","sshkey","onedata"];
-    var localApplications = ["slurm","nfs","compilers","openmpi","NFSshared","sshkey","onedata"]
+    var applications = ["slurm","compilers","openmpi","docker","galaxy","nfs","hadoop","jupyter","spark","sshkey","onedata"];
+    var localApplications = ["slurm","nfs","compilers","openmpi","sshkey","onedata"]
 
     var templatesURL = "";
     var localTemplatePrefix = "__local_";
@@ -43,7 +43,8 @@ define([
             "credential": "",
             "deploymentType": "OpenNebula",
 	    "host": "",
-	    "id": "one",
+	    "tenant": "",
+	    "id": "",
 	    "infName": "cluster-name",
             "frontend":{
                 "CPUs":1, //Minimum number of CPUs
@@ -146,7 +147,7 @@ define([
             Jupyter.toolbar.add_buttons_group([
                 Jupyter.actions.register({
                     "help"   : "Deployments list",
-                    "icon"   : "fa-comment-o",
+                    "icon"   : "fa-list",
                     "handler": toggle_DeploymentList,
                 }, "toggle-deployment-list", prefix)
             ]);
@@ -164,7 +165,7 @@ define([
             Jupyter.toolbar.add_buttons_group([
                 Jupyter.actions.register({
                     "help"   : "Infrastructure deploy",
-                    "icon"   : "fa-comment-o",
+                    "icon"   : "fal fa-sitemap",
                     "handler": toggle_Deploy,
                 }, "toggle-deploy", prefix)
             ]);
@@ -347,13 +348,23 @@ define([
 		    clearDeployInfo();
 		}
 		
-		deployInfo.id = "provider";
+		deployInfo.id = "ec2";
 		deployInfo.deploymentType = "EC2";
 		
 		state_deploy_credentials();
 	    },
-            "GCE": function() {console.log("on construction...");},
-            "Azure": function() {console.log("on construction...");}
+            "OST": function() {
+
+		//Check if the provider has been changed
+		if(deployInfo.deploymentType != "OpenStack"){
+		    clearDeployInfo();
+		}
+		
+		deployInfo.id = "ost";
+		deployInfo.deploymentType = "OpenStack";
+		
+		state_deploy_credentials();
+	    }
         });
     }
 
@@ -391,6 +402,18 @@ define([
             form.append($('<input id="hostIn" type="text" value="' + deployInfo.host + '" name="host"><br>'));
 	    
 	}
+	else if(deployInfo.deploymentType == "OpenStack"){
+	    text1 = "<p>Introduce OST credentials</p>";
+	    text2 = "Username:<br>";
+	    text3 = "Password:<br>";
+
+            //Create host input field
+            form.append("host:<br>");
+            form.append($('<input id="hostIn" type="text" value="' + deployInfo.host + '" name="host"><br>'));
+	    //Create tenant (project) input field
+            form.append("tenant:<br>");
+            form.append($('<input id="tenantIn" type="text" value="' + deployInfo.tenant + '" name="tenant"><br>'));	    	    
+	}
 
         deployDialog.append($(text1));
 
@@ -422,6 +445,11 @@ define([
 		}
 		else if(deployInfo.deploymentType == "OpenNebula"){
 		    state_deploy_ONE_frontendSpec();
+		}
+		else if(deployInfo.deploymentType == "OpenStack"){
+		    console.log("on construction...");
+		    //deployInfo.tenant = $("#tenantIn").val();
+		    //state_deploy_OST_frontendSpec();
 		}
 	    }
         });
@@ -586,6 +614,94 @@ define([
         });
     }
 
+    // state deploy OST frontendSpec
+    var state_deploy_OST_frontendSpec = function(){
+
+	//COMPLETAR!!!!
+        
+        //Get dialog
+        var deployDialog = $("#dialog-deploy");
+        
+        //Clear dialog
+        deployDialog.empty();
+        
+        //Disable shortcuts
+        Jupyter.keyboard_manager.disable();        
+        
+        //Informative text
+        deployDialog.append($("<p>Introduce frontend specifications</p>"));
+        
+        //Create form for input
+        var form = $("<form>")
+	
+        //Create image architecture input field
+        form.append("Architecture:<br>");
+        form.append($('<input id="imageArchIn" type="text" value="' + deployInfo.frontend.arch + '" name="imageArch"><br>'));
+	
+        //Create image flavour input field
+        form.append("Image flavour:<br>");
+        form.append($('<input id="imageFlavourIn" type="text" value="' + deployInfo.frontend.flavour + '" name="imageFlavour"><br>'));
+
+        //Create image version input field
+        form.append("Version:<br>");
+        form.append($('<input id="imageVersionIn" type="text" value="' + deployInfo.frontend.version + '" name="imageVersion"><br>'));
+
+        //Create CPU input field
+        form.append("Minimum CPUs:<br>");
+        form.append($('<input id="CPUsIn" type="number" value="' + deployInfo.frontend.CPUs + '" min="1" name="CPUs"><br>'));
+	
+        //Create memory input field
+        form.append("Minimum memory (MB):<br>");
+        form.append($('<input id="imageMemIn" type="number" value="' + deployInfo.frontend.memory + '" min="1024" name="imageMem"><br>'));
+	
+        //Create image url input field
+        form.append("Image url:<br>");
+	var imageURL = deployInfo.frontend.image;
+	if(imageURL.length == 0){
+	    if(deployInfo.deploymentType = "OpenStack"){
+		imageURL = "one://" + deployInfo.host + "/";
+	    }
+	}
+        form.append($('<input id="imageUrlIn" type="text" value="' + imageURL + '" name="imageUrl"><br>'));
+
+        //Create image username input field
+        form.append("Image username:<br>");
+        form.append($('<input id="imageUserIn" type="text" value="' + deployInfo.frontend.user + '" name="imageUser"><br>'));
+
+        //Create image password input field
+        form.append("Image user password:<br>");
+        form.append($('<input id="imageUserPassIn" type="password" value="' + deployInfo.frontend.credentials + '" name="imageUserPass"><br>'));
+	
+	deployDialog.append(form);
+	
+	deployDialog.dialog("option", "buttons",{
+            "Back": state_deploy_credentials,
+	    "Next": function(){
+		deployInfo.frontend.arch = $("#imageArchIn").val();
+		deployInfo.frontend.version = $("#imageVersionIn").val();
+		deployInfo.frontend.CPUs = $("#CPUsIn").val();
+		deployInfo.frontend.memory = $("#imageMemIn").val();
+		deployInfo.frontend.flavour = $("#imageFlavourIn").val();
+		deployInfo.frontend.image = $("#imageUrlIn").val();
+
+		if($("#imageUserIn").val().length == 0){
+		    deployInfo.frontend.user = "";
+		}else{
+		    deployInfo.frontend.user = $("#imageUserIn").val();
+		}
+		
+		if($("#imageUserPassIn").val().length == 0){
+		    deployInfo.frontend.credentials = ""
+		}else{
+		    deployInfo.frontend.credentials = $("#imageUserPassIn").val();
+		}
+		
+		
+		state_deploy_ONE_workerSpec();
+	    }
+        });
+    }
+    
     // state deploy-one-worker
     var state_deploy_ONE_workerSpec = function(){
         
@@ -674,20 +790,21 @@ define([
 	    var ul = $('<ul class="checkbox-grid">');
 	    for(let i = 0; i < applications.length; i++){
 
-		//Create line
-		let line = $('<li style="white-space:nowrap">'); //Force checkbox and label to stay at same line
-		//Create checkbox
-		let checkbox = $('<input type="checkbox" id="' + applications[i] + '-appCheckID" name="' + applications[i] + '" value="' + applications[i] + '">');
-		//Create label
-		let label = $('<label for=" ' + applications[i] + '">');
-		label.text(applications[i])	    
+            if(applications[i] == "sshkey"){continue;} //sshkey will be used with nfs
+            //Create line
+            let line = $('<li style="white-space:nowrap">'); //Force checkbox and label to stay at same line
+            //Create checkbox
+            let checkbox = $('<input type="checkbox" id="' + applications[i] + '-appCheckID" name="' + applications[i] + '" value="' + applications[i] + '">');
+            //Create label
+            let label = $('<label for=" ' + applications[i] + '">');
+            label.text(applications[i])	    
+    
+            //Append all to line
+            line.append(checkbox);
+            line.append(label);
 
-		//Append all to line
-		line.append(checkbox);
-		line.append(label);
-
-		//Append line to grid
-		ul.append(line);
+            //Append line to grid
+            ul.append(line);
 	    }
 	}
 	
@@ -746,6 +863,10 @@ define([
 		    if($("#" + applications[i] + "-appCheckID").length > 0){
 			if($("#" + applications[i] + "-appCheckID").is(":checked")){
 			    deployInfo.apps.push(applications[i]);
+                if(applications[i] == "nfs"){
+                    //add "sshkey" too
+                    deployInfo.apps.push("sshkey");
+                }
 			}
 		    }
 		}
