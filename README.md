@@ -95,4 +95,14 @@ To manage and use previous deployed infrastructures within Jupyter notebook envi
             * upload: Copy files from local path (first argument) to OneData space path (second argument). 
     * apricot_runMP: Executes the specified [sbash script](https://slurm.schedmd.com/sbatch.html) replacing text seeds *__N__*, where N is the range number, by all values specified in corresponding input ranges. Each range follows the same format as in *apricot_genMPid*. So, for three ranges with *N1*, *N2* and *N3* number of possible values respectively, *apricot_runMP* will execute sbatch script *Nt = N1 N2 N3* times.
         * Arguments: Cluster name identifier, script path, range1, range2...
-        
+    * apricot_ls: Takes no arguments and return a list with all deployed clusters using EC3. Internally, executes a *ec3 list*.
+    * apricot_nodels: 
+        * Arguments: Cluster name identifier.
+        * Return: A list of working nodes and their status at the specified cluster.
+    * apricot_upload: Upload specified local files to introduced cluster destination path.
+        * Arguments: Cluster name identifier, upload files paths, destination path.
+    * apricot_download: Download files located at specified cluster to local storage.
+        * Arguments: Cluster name identifier, download files paths, local destination path.
+ * Magic line and cell:
+    * apricot: Perform multiple tasks depending on input instruction.
+        * exec: 
