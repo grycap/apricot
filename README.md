@@ -105,4 +105,7 @@ To manage and use previous deployed infrastructures within Jupyter notebook envi
         * Arguments: Cluster name identifier, download files paths, local destination path.
  * Magic line and cell:
     * apricot: Perform multiple tasks depending on input instruction.
-        * exec: 
+        * exec: Take as arguments a cluster name identifier and a instruction to be executed in specified cluster. This call is syncronous.
+        * execAsync: Same as *exec* but the call is done asyncronous.
+        * list: Same as *apricot_ls*
+        * destroy: Take a cluster name identifier as argument an destroy that infrastructure.
