@@ -93,3 +93,6 @@ To manage and use previous deployed infrastructures within Jupyter notebook envi
             * unmount: Takes a mounted point as argument and ummount it.
             * download: Copy files from OneData space path (first argument) to local path (second argument). 
             * upload: Copy files from local path (first argument) to OneData space path (second argument). 
+    * apricot_runMP: Executes the specified [sbash script](https://slurm.schedmd.com/sbatch.html) replacing text seeds *__N__*, where N is the range number, by all values specified in corresponding input ranges. Each range follows the same format as in *apricot_genMPid*. So, for three ranges with *N1*, *N2* and *N3* number of possible values respectively, *apricot_runMP* will execute sbatch script *Nt = N1 N2 N3* times.
+        * Arguments: Cluster name identifier, script path, range1, range2...
+        
