@@ -81,30 +81,30 @@ If any error occurs during deployment, this will shown at web console. Also, is 
 To manage and use previous deployed infrastructures within Jupyter notebook environment, a set of Ipython magic functions has been implemented. This functions are listed below,
 
 * Magic lines:
-    * apricot_genMPid:
+    * **apricot_genMPid**:
         * Arguments: A list of ranges where each one has the format *lowest highest step*
         * Returns: A identifier created with input ranges
-    * apricot_log:
+    * **apricot_log**:
         * Arguments: Cluster name identifier
         * Returns: The configuration logs of specified cluster
-    * apricot_onedata:
+    * **apricot_onedata**:
         * Arguments: Cluster name identifier, selected instruction and instruction parameters. Valid instructions are,
             * mount: Takes a mount point, one data host and one data token to create and mount the specified space at mount point.
-            * unmount: Takes a mounted point as argument and ummount it.
+            * umount: Takes a mounted point as argument and umount it.
             * download: Copy files from OneData space path (first argument) to local path (second argument). 
             * upload: Copy files from local path (first argument) to OneData space path (second argument). 
     * apricot_runMP: Executes the specified [sbash script](https://slurm.schedmd.com/sbatch.html) replacing text seeds *__N__*, where N is the range number, by all values specified in corresponding input ranges. Each range follows the same format as in *apricot_genMPid*. So, for three ranges with *N1*, *N2* and *N3* number of possible values respectively, *apricot_runMP* will execute sbatch script *Nt = N1 N2 N3* times.
         * Arguments: Cluster name identifier, script path, range1, range2...
-    * apricot_ls: Takes no arguments and return a list with all deployed clusters using EC3. Internally, executes a *ec3 list*.
-    * apricot_nodels: 
+    * **apricot_ls**: Takes no arguments and return a list with all deployed clusters using EC3. Internally, executes a *ec3 list*.
+    * **apricot_nodels**: 
         * Arguments: Cluster name identifier.
         * Return: A list of working nodes and their status at the specified cluster.
-    * apricot_upload: Upload specified local files to introduced cluster destination path.
+    * **apricot_upload**: Upload specified local files to introduced cluster destination path.
         * Arguments: Cluster name identifier, upload files paths, destination path.
-    * apricot_download: Download files located at specified cluster to local storage.
+    * **apricot_download**: Download files located at specified cluster to local storage.
         * Arguments: Cluster name identifier, download files paths, local destination path.
  * Magic line and cell:
-    * apricot: Perform multiple tasks depending on input instruction.
+    * **apricot**: Perform multiple tasks depending on input instruction.
         * exec: Take as arguments a cluster name identifier and a instruction to be executed in specified cluster. This call is syncronous.
         * execAsync: Same as *exec* but the call is done asyncronous.
         * list: Same as *apricot_ls*
