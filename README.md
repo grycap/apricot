@@ -16,7 +16,7 @@ A generic computational experimentation involves the elements showed at next fig
 
  - Clear instructions on how to reproduce the entire experiment.
 
-![Alt text](docs/images/experiment.png?raw=true "Title")
+![Alt text](docs/images/experiment.png?raw=true "Experimentation")
 
 APRICOT, using other components, satisfy all the requirements for develop reproducible experiments within a unique environment, Jupyter notebooks. The key points for develop reproducible experiments using APRICOT extensions are,
 
@@ -31,7 +31,7 @@ APRICOT, using other components, satisfy all the requirements for develop reprod
 
 ## Components
 
-![Alt text](docs/images/APRICOT_components.png?raw=true "Title")
+![Alt text](docs/images/APRICOT_components.png?raw=true "Components")
 
 APRICOT has been constructed using the following components:
 
@@ -40,4 +40,42 @@ APRICOT has been constructed using the following components:
 - [**EC3**](https://servproject.i3m.upv.es/ec3/), an open-source tool to deploy compute clusters that can horizontally scale in terms of number of nodes with multiple plugins.
 - [**IM**](https://www.grycap.upv.es/im/index.php), an open-source virtual infrastructure provisioning tool for multi-Clouds.
 - [**ONEDATA**](https://github.com/grycap/clues), global data storage backed by computing centers and storage providers worldwide.
+
+## Installation
+
+### Requisites
+
+APRICOT needs EC3 client to deploy and infrastructure and get credentials. The installation details can be found at [EC3 documentation](https://ec3.readthedocs.io/en/devel/intro.html#installation).
+
+Also, APRICOT requires a [Jupyter installation](https://jupyter.org/install), since uses its environment to run. Should be compatible with Jupyter 4.x and 5.x versions.
+
+### Installing
+
+To install APRICOT package, run the provided install script
+
+`` bash install.sh``
+
+## Deployment
+
+Infrastructure deployment with APRICOT is done using a notebook extension. This one, creates the button showed at next image, which opens a GUI to guide the user step by step trough deployment process.
+
+
+![Alt text](docs/images/pluginDeploy.png?raw=true "Deploy plugin")
+
+
+Deployment process include,
+
+- Select infrastructure topology between a set of predefined infrastructures. At the moment, predefined topologies are Batch-Cluster, MPI-Cluster and Advanced which allows a custom configuration.
+- Select a cloud provider where deploy the infrastructure. Actual supported providers are OpenNebula and AWS.
+- Depending on selected provider, introduce necessary access credentials.
+- Specify frontend and workers specifications such as memory, CPUs, OS image etc.
+- Set infrastructure features like maximum number of workers or cluster identifier name.
+- Deploy the infrastructure.
+
+If any error occurs during deployment, this will shown at web console. Also, is possible to get cluster configuration logs using implemented magics functions.
+
+## Infrastructure management
+
+To manage and use previous deployed infrastructures within Jupyter notebook environment, a set of Ipython magic functions has been implemented. This functions are listed below,
+
 
