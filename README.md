@@ -82,14 +82,14 @@ To manage and use previous deployed infrastructures within Jupyter notebook envi
 
 * Magic lines:
     * apricot_genMPid:
-          * Arguments: A list of ranges where each one has the format *lowest highest step*
-          * Returns: A identifier created with input ranges
+        * Arguments: A list of ranges where each one has the format *lowest highest step*
+        * Returns: A identifier created with input ranges
     * apricot_log:
-          * Arguments: Cluster name identifier
-          * Returns: The configuration logs of specified cluster
+        * Arguments: Cluster name identifier
+        * Returns: The configuration logs of specified cluster
     * apricot_onedata:
-          * Arguments: Cluster name identifier, selected instruction and instruction parameters. Valid instructions are,
-                 * mount: Takes a mount point, one data host and one data token to create and mount the specified space at mount point.
-                 * unmount: Takes a mounted point as argument and ummount it.
-                 * download: Copy files from OneData space path (first argument) to local path (second argument). 
-                 * upload: Copy files from local path (first argument) to OneData space path (second argument). 
+        * Arguments: Cluster name identifier, selected instruction and instruction parameters. Valid instructions are,
+            * mount: Takes a mount point, one data host and one data token to create and mount the specified space at mount point.
+            * unmount: Takes a mounted point as argument and ummount it.
+            * download: Copy files from OneData space path (first argument) to local path (second argument). 
+            * upload: Copy files from local path (first argument) to OneData space path (second argument). 
