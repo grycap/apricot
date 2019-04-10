@@ -72,10 +72,24 @@ Deployment process include,
 - Set infrastructure features like maximum number of workers or cluster identifier name.
 - Deploy the infrastructure.
 
+![Alt text](docs/images/deploySteps.png?raw=true "Deploy steps")
+
 If any error occurs during deployment, this will shown at web console. Also, is possible to get cluster configuration logs using implemented magics functions.
 
 ## Infrastructure management
 
 To manage and use previous deployed infrastructures within Jupyter notebook environment, a set of Ipython magic functions has been implemented. This functions are listed below,
 
-
+* Magic lines:
+    * apricot_genMPid:
+          * Arguments: A list of ranges where each one has the format *lowest highest step*
+          * Returns: A identifier created with input ranges
+    * apricot_log:
+          * Arguments: Cluster name identifier
+          * Returns: The configuration logs of specified cluster
+    * apricot_onedata:
+          * Arguments: Cluster name identifier, selected instruction and instruction parameters. Valid instructions are,
+                 * mount: Takes a mount point, one data host and one data token to create and mount the specified space at mount point.
+                 * unmount: Takes a mounted point as argument and ummount it.
+                 * download: Copy files from OneData space path (first argument) to local path (second argument). 
+                 * upload: Copy files from local path (first argument) to OneData space path (second argument). 
