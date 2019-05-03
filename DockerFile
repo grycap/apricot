@@ -1,6 +1,12 @@
 #Download base image ubuntu 16.04
 FROM ubuntu:16.04
 
+# Set root user
+USER root
+
+# Create a user for jupyter server
+RUN useradd -ms /bin/bash jupyserver
+
 # Update Ubuntu Software repository
 RUN apt-get update
 
@@ -17,8 +23,22 @@ RUN pip install ec3-cli
 # Install git
 RUN apt-get install -y git
 
+# Create the script to init jupyter server
+RUN echo "#!/bin/bash" > /bin/jupyter-apricot
+RUN echo "jupyter notebook --ip 0.0.0.0 --no-browser" >> /bin/jupyter-apricot
+
+# Add execution permissions
+RUN chmod +x /bin/jupyter-apricot
+
+# Change to jupyter server user
+USER jupyserver
+WORKDIR /home/jupyserver
+
 # Clone git
 RUN git clone https://github.com/grycap/apricot.git
 
 # Install apricot
-RUN bash apricot/install.sh
+RUN cd apricot && bash install.sh
+
+# Remove download files
+RUN rm -r apricot
