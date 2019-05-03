@@ -112,6 +112,10 @@ To manage and use previous deployed infrastructures within Jupyter notebook envi
 
 Like any Jupyter magics, these must be lodaded at the notebook using *%reload_ext apricot_magic* or configure jupyter to load these magics in all notebooks.
 
+## Docker
+
+A dockerfile to construct a container with jupyter and apricot configured is under construction.
+
 ## Licensing
 
 APRICOT is licensed under the Apache License, Version 2.0. See [LICENSE](https://github.com/grycap/apricot/blob/master/LICENSE) for the full license text.
