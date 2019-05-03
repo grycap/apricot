@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='apricot-grycap',
-    packages=['apricot'],
+    packages=['apricot_magic'],
     description='Advanced Platform for Reproducible Infrastructures in the Cloud via Open Tools',
     version='0.0.1',
     author='vigial',
