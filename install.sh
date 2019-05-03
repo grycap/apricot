@@ -1,33 +1,25 @@
 
 #!/bin/bash
 
-PWD=`pwd`
+#Install and enable plugin content
 
-#Create plugin folder
-pluginDir=`pip show jupyter_contrib_nbextensions | grep "Location:" | cut -d ':' -f 2`
-
-echo "Plugin directory: $pluginDir"
-
-rm -r $pluginDir &> /dev/null
-
-if mkdir $pluginDir; then
-    echo -e "Plugin folder created: $pluginDir"
-else
-    echo -e "Unable to create plugin folder: $pluginDir"
-    exit 1
-fi
-
-#Copy plugin content
-if cp -r apricot_plugin/* $pluginDir; then
-
+if jupyter nbextension install apricot_plugin --user; then
     echo -e "Plugin installed."
     
 else
 
     echo -e "Plugin installation failed!"
-    echo -e "Unable to copy files from $PWD/plugin to $pluginDir"
     exit 2
 fi
+
+if jupyter nbextension enable apricot_plugin/main --user; then
+    echo -e "Plugin enabled."
+    
+else
+
+    echo -e "Fail enabling plugin!"
+fi
+
 
 #Install apricot magics (default python)
 if python -m pip install --user -e apricot_magic; then
