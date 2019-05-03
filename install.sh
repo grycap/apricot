@@ -3,7 +3,7 @@
 
 #Install and enable plugin content
 
-if jupyter nbextension install apricot_plugin --user; then
+if jupyter nbextension install $PWD/apricot_plugin --user; then
     echo -e "Plugin installed."
     
 else
@@ -22,7 +22,7 @@ fi
 
 
 #Install apricot magics (default python)
-if python -m pip install --user -e apricot_magic; then
+if python -m pip install --user -e $PWD/apricot_magic; then
 
     echo -e "magics succesfuly installed"
     
@@ -32,7 +32,7 @@ else
 fi
 
 #Install apricot magics (python3)
-if python3 -m pip install --user -e apricot_magic; then
+if python3 -m pip install --user -e $PWD/apricot_magic; then
 
     echo -e "magics succesfuly installed"
     
@@ -41,7 +41,7 @@ else
 fi
 
 #Install apricot magics (python2.7)
-if python2.7 -m pip install --user -e apricot_magic; then
+if python2.7 -m pip install --user -e $PWD/apricot_magic; then
 
     echo -e "magics succesfuly installed"
     
