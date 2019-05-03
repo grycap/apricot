@@ -5,16 +5,17 @@ FROM ubuntu:16.04
 RUN apt-get update
 
 # Install python and jupyter
-RUN apt-get install -y python3 python2 
+RUN apt-get install -y python3 python2.7
 
+RUN apt-get install -y python3-pip
+RUN apt-get install -y python-pip
 RUN pip3 install --upgrade pip
-RUN apt install python3-pip
-RUN apt install python2-pip
+RUN pip2 install --upgrade pip
 RUN pip3 install jupyter
 RUN pip install ec3-cli
 
 # Install git
-RUN pat-get install git
+RUN apt-get install -y git
 
 # Clone git
 RUN git clone https://github.com/grycap/apricot.git
