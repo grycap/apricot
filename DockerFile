@@ -10,6 +10,8 @@ RUN useradd -ms /bin/bash jupyserver
 # Update Ubuntu Software repository
 RUN apt-get update
 
+RUN apt-get install -y nano
+
 # Install python and jupyter
 RUN apt-get install -y python3 python2.7
 
@@ -38,7 +40,9 @@ WORKDIR /home/jupyserver
 RUN git clone https://github.com/grycap/apricot.git
 
 # Install apricot
-RUN cd apricot && bash install.sh
+WORKDIR /home/jupyserver/apricot
+RUN sh install.sh
+WORKDIR /home/jupyserver
 
 # Remove download files
 RUN rm -r apricot
