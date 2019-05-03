@@ -4,7 +4,10 @@
 PWD=`pwd`
 
 #Create plugin folder
-pluginDir="$HOME/.local/share/jupyter/nbextensions/apricot"
+pluginDir=`pip show jupyter_contrib_nbextensions | grep "Location:" | cut -d ':' -f 2`
+
+echo "Plugin directory: $pluginDir"
+
 rm -r $pluginDir &> /dev/null
 
 if mkdir $pluginDir; then
