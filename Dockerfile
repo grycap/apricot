@@ -11,6 +11,7 @@ RUN useradd -ms /bin/bash jupyserver
 RUN apt-get update
 
 RUN apt-get install -y nano
+RUN apt-get install -y curl
 
 # Install python and jupyter
 RUN apt-get install -y python3 python2.7
