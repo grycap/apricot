@@ -2,8 +2,7 @@
 #!/bin/bash
 
 #Create ec3 RADL template file (just in case)
-mkdir $HOME/.ec3 &> /dev/null
-mkdir $HOME/.ec3/templates &> /dev/null
+mkdir -p $HOME/.ec3/templates
 
 #Install and enable plugin content
 if jupyter nbextension install apricot_plugin --user; then
