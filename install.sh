@@ -1,8 +1,11 @@
 
 #!/bin/bash
 
-#Install and enable plugin content
+#Create ec3 RADL template file (just in case)
+mkdir $HOME/.ec3 &> /dev/null
+mkdir $HOME/.ec3/templates &> /dev/null
 
+#Install and enable plugin content
 if jupyter nbextension install apricot_plugin --user; then
     echo -e "Plugin installed."
     
