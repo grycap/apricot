@@ -296,7 +296,7 @@ define([
 		//Clear deploy apps selection
 		deployInfo.apps = [];
 		for(let i = 0; i < deployInfo.apps.length; i++){
-			deployInfo.apps.append(commonapps[i])
+			deployInfo.apps.push(commonapps[i])
 		}
 		state_deploy_provider();
 	    },
@@ -305,7 +305,7 @@ define([
 		//Clear deploy apps selection
 		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata","openports"];
 		for(let i = 0; i < deployInfo.apps.length; i++){
-			deployInfo.apps.append(commonapps[i])
+			deployInfo.apps.push(commonapps[i])
 		}		    
 		state_deploy_provider();
 	    },
@@ -314,7 +314,7 @@ define([
 		//Clear deploy apps selection
 		deployInfo.apps = ["nfs","sshkey","compilers","onedata","openports"];
 		for(let i = 0; i < deployInfo.apps.length; i++){
-			deployInfo.apps.append(commonapps[i])
+			deployInfo.apps.push(commonapps[i])
 		}		    
 		state_deploy_provider();
 	    }
