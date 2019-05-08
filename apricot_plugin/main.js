@@ -295,7 +295,7 @@ define([
 		deployInfo.topology = "Advanced";
 		//Clear deploy apps selection
 		deployInfo.apps = [];
-		for(let i = 0; i < deployInfo.apps.length; i++){
+		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}
 		state_deploy_provider();
@@ -304,7 +304,7 @@ define([
 		deployInfo.topology = "MPI-Cluster";
 		//Clear deploy apps selection
 		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata","openports"];
-		for(let i = 0; i < deployInfo.apps.length; i++){
+		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		    
 		state_deploy_provider();
@@ -313,7 +313,7 @@ define([
 		deployInfo.topology = "Batch-Cluster";
 		//Clear deploy apps selection
 		deployInfo.apps = ["nfs","sshkey","compilers","onedata","openports"];
-		for(let i = 0; i < deployInfo.apps.length; i++){
+		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		    
 		state_deploy_provider();
