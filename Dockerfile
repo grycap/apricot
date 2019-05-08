@@ -38,7 +38,7 @@ USER jupyserver
 WORKDIR /home/jupyserver
 
 # Clone git
-RUN git clone --single-branch --branch vigial-include-radls https://github.com/grycap/apricot.git
+RUN git clone https://github.com/grycap/apricot.git
 
 # Install apricot
 WORKDIR /home/jupyserver/apricot
