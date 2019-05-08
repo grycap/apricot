@@ -39,12 +39,15 @@ USER jupyserver
 WORKDIR /home/jupyserver
 
 # Clone git
+RUN ls
 RUN git clone https://github.com/grycap/apricot.git
 
 # Install apricot
 WORKDIR /home/jupyserver/apricot
 RUN sh install.sh
 WORKDIR /home/jupyserver
+
+# Copy examples
 RUN cp -r apricot/examples .
 
 # Remove download files
