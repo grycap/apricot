@@ -45,6 +45,7 @@ RUN git clone https://github.com/grycap/apricot.git
 WORKDIR /home/jupyserver/apricot
 RUN sh install.sh
 WORKDIR /home/jupyserver
+RUN cp -r apricot/examples .
 
 # Remove download files
 RUN rm -r apricot
