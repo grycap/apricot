@@ -12,6 +12,7 @@ RUN apt-get update
 
 RUN apt-get install -y nano
 RUN apt-get install -y curl
+RUN apt-get install -y sshpass
 
 # Install python and jupyter
 RUN apt-get install -y python3 python2.7
