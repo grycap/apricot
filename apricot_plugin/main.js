@@ -22,9 +22,9 @@ define([
     var prefix = "infrastructure-deployment";
     
     var queues = ["slurm"];
-    var commonapps = ["openports","clues","clues2"];
+    var commonapps = ["openports","clues"];
     var applications = ["slurm","compilers","openmpi","nfs","sshkey","onedata"];
-    var localApplications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","openports","clues","clues2"];
+    var localApplications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","openports","clues"];
 
     var templatesURL = "";
     var localTemplatePrefix = "__local_";
