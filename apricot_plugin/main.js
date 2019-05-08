@@ -22,8 +22,9 @@ define([
     var prefix = "infrastructure-deployment";
     
     var queues = ["slurm"];
-    var applications = ["slurm","compilers","openmpi","docker","galaxy","nfs","hadoop","jupyter","spark","sshkey","onedata"];
-    var localApplications = ["slurm","nfs","compilers","openmpi","sshkey","onedata"]
+    var commonapps = ["openports","clues","clues2"];
+    var applications = ["slurm","compilers","openmpi","nfs","sshkey","onedata"];
+    var localApplications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","openports","clues","clues2"]
 
     var templatesURL = "";
     var localTemplatePrefix = "__local_";
@@ -293,19 +294,28 @@ define([
             "Advanced": function() {
 		deployInfo.topology = "Advanced";
 		//Clear deploy apps selection
-		deployInfo.apps = [];		
+		deployInfo.apps = [];
+		for(let i = 0; i < deployInfo.apps.length; i++){
+			deployInfo.apps.append(commonapps[i])
+		}
 		state_deploy_provider();
 	    },
             "MPI-Cluster": function() {
 		deployInfo.topology = "MPI-Cluster";
 		//Clear deploy apps selection
-		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata"];
+		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata","openports"];
+		for(let i = 0; i < deployInfo.apps.length; i++){
+			deployInfo.apps.append(commonapps[i])
+		}		    
 		state_deploy_provider();
 	    },
             "Batch-Cluster": function() {
 		deployInfo.topology = "Batch-Cluster";
 		//Clear deploy apps selection
-		deployInfo.apps = ["nfs","sshkey","compilers","onedata"];
+		deployInfo.apps = ["nfs","sshkey","compilers","onedata","openports"];
+		for(let i = 0; i < deployInfo.apps.length; i++){
+			deployInfo.apps.append(commonapps[i])
+		}		    
 		state_deploy_provider();
 	    }
         });
