@@ -303,7 +303,7 @@ define([
             "MPI-Cluster": function() {
 		deployInfo.topology = "MPI-Cluster";
 		//Clear deploy apps selection
-		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata","openports"];
+		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata"];
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		    
@@ -312,7 +312,7 @@ define([
             "Batch-Cluster": function() {
 		deployInfo.topology = "Batch-Cluster";
 		//Clear deploy apps selection
-		deployInfo.apps = ["nfs","sshkey","compilers","onedata","openports"];
+		deployInfo.apps = ["nfs","sshkey","compilers","onedata"];
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		    
