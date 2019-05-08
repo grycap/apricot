@@ -1121,8 +1121,8 @@ define([
 	//cmd += " --dry-run";
 
 	//Remove pipe and radl
-	cmd += "rm $PWD/" + pipeAuth + " &> /dev/null \n";
-	cmd += "rm -r $PWD/templates &> /dev/null \n";
+	//cmd += "rm $PWD/" + pipeAuth + " &> /dev/null \n";
+	//cmd += "rm -r $PWD/templates &> /dev/null \n";
 
 	//Print ec3 output on stderr or stdout
 	cmd += "if [ $? -ne 0 ]; then \n";
