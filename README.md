@@ -114,7 +114,15 @@ Like any Jupyter magics, these must be lodaded at the notebook using *%reload_ex
 
 ## Docker
 
-A dockerfile to construct a container with jupyter and apricot configured is under construction.
+A docker file has been provided to construct a docker image with jupyter and apricot configured. Use
+
+`` docker pull grycap/apricot ``
+
+to pull the image. Then, use
+
+`` docker run --publish 8888:8888 -it grycap/apricot ``
+
+to create and execute a container. The container will start automatically a jupyter server with apricot preconfigured. Then, use the url provided by jupyter to access to the server.
 
 ## Licensing
 
