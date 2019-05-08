@@ -21,7 +21,7 @@ RUN apt-get install -y python-pip
 RUN pip3 install --upgrade pip
 RUN pip2 install --upgrade pip
 RUN pip3 install jupyter
-RUN pip install ec3-cli
+RUN pip2 install ec3-cli
 
 # Install git
 RUN apt-get install -y git
@@ -47,3 +47,6 @@ WORKDIR /home/jupyserver
 
 # Remove download files
 RUN rm -r apricot
+
+# Set entry point
+ENTRYPOINT ["/bin/jupyter-apricot"]

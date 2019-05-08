@@ -89,7 +89,7 @@ configure wn (
 )
 
 include slurm_misc (
-  template = 'openports'
+  template = '__local_openports'
 )
 
 deploy front 1

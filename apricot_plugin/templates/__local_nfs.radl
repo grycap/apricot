@@ -61,5 +61,5 @@ configure wn (
 )
 
 include nfs_misc (
-  template = 'openports'
+  template = '__local_openports'
 )
