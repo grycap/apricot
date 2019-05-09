@@ -36,7 +36,7 @@ APRICOT can be used to achieve reproducible experiments for experiments that req
 APRICOT has been constructed using the following components:
 
 - [**Jupyter**](https://jupyter.org/), an open-source web application that allows you to create and share documents that contain live code, equations, visualizations and narrative text. 
-- [**CLUES**](https://github.com/grycap/clues), an elasticity manager that horizontally scales in and out the number of nodes of the Kubernetes cluster according to the workload.
+- [**CLUES**](https://github.com/grycap/clues), an energy management system for High Performance Computing (HPC) Clusters and Cloud infrastructures.
 - [**EC3**](https://servproject.i3m.upv.es/ec3/), an open-source tool to deploy compute clusters that can horizontally scale in terms of number of nodes with multiple plugins.
 - [**IM**](https://www.grycap.upv.es/im/index.php), an open-source virtual infrastructure provisioning tool for multi-Clouds.
 - [**ONEDATA**](https://github.com/grycap/clues), global data storage backed by computing centers and storage providers worldwide.
