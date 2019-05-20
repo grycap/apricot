@@ -511,6 +511,10 @@ define([
         form.append("Worker instance type:<br>");
         form.append($('<input id="workerInstanceTypeIn" type="text" value="' + deployInfo.worker.instance + '" name="workerInstanceType"><br>'));
 
+        //Create image username input field
+        form.append("Image username:<br>");
+        form.append($('<input id="imageUserIn" type="text" value="' + deployInfo.frontend.user + '" name="imageUser"><br>'));	    
+	    
 	//Append elements to dialog
 	deployDialog.append(form);
 	
@@ -526,12 +530,12 @@ define([
 		//Frontend
 		deployInfo.frontend.instance = $("#frontendInstanceTypeIn").val();
 		deployInfo.frontend.image = imageURL;
-		deployInfo.frontend.user = "ubuntu";
+		deployInfo.frontend.user = $("#imageUserIn").val();
 
 		//Worker
 		deployInfo.worker.instance = $("#workerInstanceTypeIn").val();
 		deployInfo.worker.image = imageURL;
-		deployInfo.worker.user = "ubuntu";
+		deployInfo.worker.user = $("#imageUserIn").val();
 		
 		state_deploy_app(state_deploy_EC2_instances);
 	    }
@@ -1034,12 +1038,10 @@ define([
 		cmd += "disk.0.image.url ='" + obj.frontend.image + "'";
 	    }
 	    
-	    if(obj.frontend.user.length > 0){
-		cmd += " and\n disk.0.os.credentials.username = '" + obj.frontend.user + "'";
-	    }
 	    if(obj.frontend.credentials.length > 0){
+		cmd += " and\n disk.0.os.credentials.username = '" + obj.frontend.user + "'";
 		cmd += " and\n disk.0.os.credentials.password = '" + obj.frontend.credentials + "'";
-	    }
+	    } //If no password has been provided, is supposed the use of contextualized image
 	    cmd += "\n"
 	    
 	}
@@ -1091,12 +1093,10 @@ define([
 		cmd += "disk.0.image.url ='" + obj.worker.image + "'";
 	    }
 	    
-	    if(obj.worker.user.length > 0){
-		cmd += " and\n disk.0.os.credentials.username = '" + obj.worker.user + "'";
-	    }
 	    if(obj.worker.credentials.length > 0){
+		cmd += " and\n disk.0.os.credentials.username = '" + obj.worker.user + "'";
 		cmd += " and\n disk.0.os.credentials.password = '" + obj.worker.credentials + "'";
-	    }
+	    }//If no password has been provided, is supposed the use of contextualized image
 	    cmd += "\n"
 	    
 	}
