@@ -40,8 +40,7 @@ configure front(
       when: keyStatus.stat.exists == False
 
     - name: Add actual and future workers as known hosts
-      shell: for i in `seq 1 2000`; do cat ~/.ssh/template >> ~/.ssh/known_hosts; sed -i -e 's/127.0.0.1/wn'$i'/g' ~/.ssh/k
-nown_hosts; done
+      shell: for i in `seq 1 2000`; do cat ~/.ssh/template >> ~/.ssh/known_hosts; sed -i -e 's/127.0.0.1/wn'$i'/g' ~/.ssh/known_hosts; done
       become: yes
       become_user: __USER_NAME__
       when: keyStatus.stat.exists == False
