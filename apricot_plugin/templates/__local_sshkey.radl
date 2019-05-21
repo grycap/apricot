@@ -1,39 +1,49 @@
-
 description local_sshkey (
     kind = 'component' and
     short = 'Generate ssh key and register wokers' and
     content = 'ssh key on ~/.ssh/id_rsa and pub key ~/.ssh/id_rsa.pub. Pub key will be added to authorized keys file'
-) 
+)
 
 configure front(
 @begin
 
   - ec3_prio: -1
+
   - tasks:
+    - name: Check if keys has already been created
+      stat:
+       path: /home/__USER_NAME__/.ssh/id_rsa
+      register: keyStatus
+
     - name: Generate key pair
       shell: ssh-keygen -t rsa -f /home/__USER_NAME__/.ssh/id_rsa -N ""
       become: yes
       become_user: __USER_NAME__
-      
+      when: keyStatus.stat.exists == False
+
     - name: Add public key to authorised keys
       shell: cat /home/__USER_NAME__/.ssh/id_rsa.pub >> /home/__USER_NAME__/.ssh/authorized_keys
       become: yes
       become_user: __USER_NAME__
-      
+      when: keyStatus.stat.exists == False
+
     - name: Add server as known hosts
       shell: ssh-keyscan `hostname` >> ~/.ssh/known_hosts
       become: yes
       become_user: __USER_NAME__
-      
+      when: keyStatus.stat.exists == False
+
     - name: Create a template to add workers to kown hosts list
       shell: ssh-keyscan 127.0.0.1 >> ~/.ssh/template
       become: yes
       become_user: __USER_NAME__
-      
+      when: keyStatus.stat.exists == False
+
     - name: Add actual and future workers as known hosts
       shell: for i in `seq 1 2000`; do cat ~/.ssh/template >> ~/.ssh/known_hosts; sed -i -e 's/127.0.0.1/wn'$i'/g' ~/.ssh/known_hosts; done
       become: yes
       become_user: __USER_NAME__
-      
+      when: keyStatus.stat.exists == False
+
 @end
 )

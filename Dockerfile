@@ -1,57 +1,30 @@
-#Download base image ubuntu 16.04
-FROM ubuntu:16.04
+#Download base image ubuntu 18.04
+FROM ubuntu:18.04
 
 # Set root user
 USER root
 
-# Create a user for jupyter server
-RUN useradd -ms /bin/bash jupyserver
-
-# Update Ubuntu Software repository
-RUN apt-get update
-
-RUN apt-get install -y nano
-RUN apt-get install -y curl
-RUN apt-get install -y sshpass
-
-# Install python and jupyter
-RUN apt-get install -y python3 python2.7
-
-RUN apt-get install -y python3-pip
-RUN apt-get install -y python-pip
-RUN pip3 install --upgrade pip
-RUN pip2 install --upgrade pip
-RUN pip3 install jupyter
-RUN pip2 install ec3-cli
-
-# Install git
-RUN apt-get install -y git
+# Update Ubuntu Software repository and install python, jupyter and git
+RUN apt-get update && apt-get install -y nano && apt-get install -y curl && apt-get install -y sshpass && \
+    apt-get install -y python3 python2.7 && apt-get install -y python3-pip && apt-get install -y python-pip && \
+    python3 -m pip install --upgrade pip && python2 -m pip install --upgrade pip && python3 -m pip install jupyter &&\
+    python2 -m pip install ec3-cli && apt-get install -y git
 
 # Create the script to init jupyter server
-RUN echo "#!/bin/bash" > /bin/jupyter-apricot
-RUN echo "jupyter notebook --ip 0.0.0.0 --no-browser" >> /bin/jupyter-apricot
+RUN echo "#!/bin/bash" > /bin/jupyter-apricot && \
+    echo "jupyter notebook --ip 0.0.0.0 --no-browser" >> /bin/jupyter-apricot && \
+    chmod +x /bin/jupyter-apricot
 
-# Add execution permissions
-RUN chmod +x /bin/jupyter-apricot
+# Create a user for jupyter server
+RUN useradd -ms /bin/bash jupyserver
 
 # Change to jupyter server user
 USER jupyserver
 WORKDIR /home/jupyserver
 
-# Clone git
-RUN ls
-RUN git clone https://github.com/grycap/apricot.git
-
-# Install apricot
-WORKDIR /home/jupyserver/apricot
-RUN sh install.sh
-WORKDIR /home/jupyserver
-
-# Copy examples
-RUN cp -r apricot/examples .
-
-# Remove download files
-RUN rm -r apricot
+# Clone git, install, get the examples and clera files
+RUN git clone https://github.com/grycap/apricot.git && cd /home/jupyserver/apricot \
+    && sh install.sh && cd /home/jupyserver && cp -r apricot/examples . && mv apricot .apricot_git
 
 # Set entry point
 ENTRYPOINT ["/bin/jupyter-apricot"]
