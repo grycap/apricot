@@ -24,7 +24,7 @@ WORKDIR /home/jupyserver
 
 # Clone git, install, get the examples and clera files
 RUN git clone https://github.com/grycap/apricot.git && cd /home/jupyserver/apricot \
-    && sh install.sh && cd /home/jupyserver && cp -r apricot/examples . && rm -r apricot
+    && sh install.sh && cd /home/jupyserver && cp -r apricot/examples . && mv apricot .apricot_git
 
 # Set entry point
 ENTRYPOINT ["/bin/jupyter-apricot"]
