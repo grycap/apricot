@@ -13,8 +13,8 @@ cd results/__RUN_ID__/__0__-__1__-__2__
 echo "NVoxels: __0__ __0__ __1__"
 
 #Copy executable files
-cp /home/ubuntu/input/reconstructor .
-cp /home/ubuntu/input/evaluateImage .
+cp input/reconstructor .
+cp input/evaluateImage .
 
 echo "N chunks: __2__"
 
