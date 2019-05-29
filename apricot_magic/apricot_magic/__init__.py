@@ -24,7 +24,7 @@ class Apricot(Magics):
 
         return list(filter(len,line.split(pattern)))
 
-    def multiparametricRun(self, clustername, queue, script, ranges, rangeID):
+    def multiparametricRun(self, execPath, clustername, queue, script, ranges, rangeID):
 
         if queue != "slurm":
             return "fail: only slurm queue system is allowed"
@@ -40,12 +40,12 @@ class Apricot(Magics):
             localScript = script.replace(identifier,str(value))
             if(rangeID == 0):
                 #print(localScript)
-                command = "exec " + clustername + " sbatch << " + localScript
+                command = "exec " + clustername + " cd execPath && sbatch << " + localScript
                 if self.apricot(command) != "done":
                     return "fail"
                 
             else:
-                self.multiparametricRun(clustername, queue, localScript, ranges, rangeID-1)
+                self.multiparametricRun(execPath, clustername, queue, localScript, ranges, rangeID-1)
             value += step
         return "done"
 
@@ -210,8 +210,8 @@ class Apricot(Magics):
             
     @line_magic
     def apricot_runMP(self,line):
-        if len(line) == 0:
-            print("usage: runMP clustername script range1 range2...\n")
+        if len(line) < 4:
+            print("usage: runMP clustername script execution-path range1 range2...\n")
             print("range format is as follows: lowest highest step")
             return "fail"
         #Split line
@@ -223,8 +223,11 @@ class Apricot(Magics):
         #Get script name
         filename = words[1]
 
+        #Get execution path
+        execPath = words[2]        
+        
         #Extract ranges data
-        rangesDataString = words[2:]
+        rangesDataString = words[3:]
         rangesData = [float(i) for i in rangesDataString]
         
         #Check if last range is incomplete
@@ -272,7 +275,7 @@ class Apricot(Magics):
         # Add EOF at the beggining to introduce the script in command line
         script = "EOF \n" + script + "\nEOF\n"
 
-        return self.multiparametricRun(clusterName, "slurm", script, rangesData, nRanges-1)
+        return self.multiparametricRun(execPath, clusterName, "slurm", script, rangesData, nRanges-1)
         
     @line_magic
     def apricot_ls(self, line):
