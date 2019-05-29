@@ -40,7 +40,7 @@ class Apricot(Magics):
             localScript = script.replace(identifier,str(value))
             if(rangeID == 0):
                 #print(localScript)
-                command = "exec " + clustername + " cd execPath && sbatch << " + localScript
+                command = "exec " + clustername + " cd " + execPath + " && sbatch << " + localScript
                 if self.apricot(command) != "done":
                     return "fail"
                 
