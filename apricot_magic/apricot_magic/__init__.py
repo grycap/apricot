@@ -543,7 +543,7 @@ class Apricot(Magics):
                 #Get ssh instruction to execute on cluster
                 pipes = subprocess.Popen(["ec3","ssh","--show-only", clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
                         
-                ssh_instruct, std_err = pipes.communicate()
+                ssh_instruct, std_err = pipes.communicate()                
 
                 if pipes.returncode == 0:
                         
@@ -551,14 +551,15 @@ class Apricot(Magics):
                     ssh_instruct = self.splitClear(ssh_instruct,"\n")[0]
                     ssh_instruct = self.splitClear(ssh_instruct)
                     ssh_instruct.extend(clusterCMD)
-                    pipes = subprocess.Popen(ssh_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+                    pipes = subprocess.Popen(ssh_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                     #Check if the call is asyncronous
                     if word1 == "execAsync":
                         return pipes
                     
                     std_out, std_err = pipes.communicate()
-
+                    std_out = std_out.decode('utf-8')
+                
                     if pipes.returncode == 0:
                         #Send output to notebook
                         print( std_out )
