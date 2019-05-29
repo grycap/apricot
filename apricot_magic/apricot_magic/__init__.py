@@ -112,9 +112,11 @@ class Apricot(Magics):
         clusterName = words[0]
 
         #Get log
-        pipes = subprocess.Popen(["ec3","show","-r",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","show","-r",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         log, std_err = pipes.communicate()
+        log = log.decode('utf-8')
+        std_err = std_err.decode('utf-8')
 
         print(log)
 
@@ -279,9 +281,12 @@ class Apricot(Magics):
         
     @line_magic
     def apricot_ls(self, line):
-        pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         std_out, std_err = pipes.communicate()
                     
+        std_out = std_out.decode('utf-8')
+        std_err = std_err.decode('utf-8')
+          
         if pipes.returncode == 0:
             #Send output to notebook
             print(std_out)
@@ -347,10 +352,13 @@ class Apricot(Magics):
             i = i+1
             
         #Get ssh instruction
-        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         ssh_instruct, std_err = pipes.communicate()
-    
+
+        ssh_instruct = ssh_instruct.decode('utf-8')
+        std_err = std_err.decode('utf-8')
+        
         if pipes.returncode == 0:        
             #Replace ssh by scp
             ssh_instruct = self.splitClear(ssh_instruct,'\n')[0]
@@ -397,11 +405,11 @@ class Apricot(Magics):
             scp_instruct.append(host)
             
             #Execute scp
-            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     
             std_out, std_err = pipes.communicate()
-            #std_out = std_out.decode("utf-8")
-            #std_err = std_err.decode("utf-8")
+            std_out = std_out.decode("utf-8")
+            std_err = std_err.decode("utf-8")
                     
             if pipes.returncode == 0:
                 #Send output to notebook
@@ -431,9 +439,11 @@ class Apricot(Magics):
         del words[len(words)-1]
         
         #Get ssh instruction
-        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         ssh_instruct, std_err = pipes.communicate()
+        ssh_instruct = ssh_instruct.decode("utf-8")
+        std_err = std_err.decode("utf-8")
     
         if pipes.returncode == 0:        
             #Replace ssh by scp
@@ -489,11 +499,11 @@ class Apricot(Magics):
             scp_instruct.append(destination)
 
             #Execute scp
-            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             std_out, std_err = pipes.communicate()
-            #std_out = std_out.decode("utf-8")
-            #std_err = std_err.decode("utf-8")
+            std_out = std_out.decode("utf-8")
+            std_err = std_err.decode("utf-8")
                     
             if pipes.returncode == 0:
                 #Send output to notebook
@@ -541,9 +551,11 @@ class Apricot(Magics):
                 clusterCMD = words[2:]
                 
                 #Get ssh instruction to execute on cluster
-                pipes = subprocess.Popen(["ec3","ssh","--show-only", clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+                pipes = subprocess.Popen(["ec3","ssh","--show-only", clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         
                 ssh_instruct, std_err = pipes.communicate()                
+                ssh_instruct = ssh_instruct.decode("utf-8")
+                std_err = std_err.decode("utf-8")
 
                 if pipes.returncode == 0:
                         
@@ -558,7 +570,8 @@ class Apricot(Magics):
                         return pipes
                     
                     std_out, std_err = pipes.communicate()
-                    std_out = std_out.decode('utf-8')
+                    std_out = std_out.decode("utf-8")
+                    std_err = std_err.decode("utf-8")
                 
                     if pipes.returncode == 0:
                         #Send output to notebook
@@ -578,11 +591,11 @@ class Apricot(Magics):
                 
         elif word1 == "list":
                 
-            pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     
             std_out, std_err = pipes.communicate()
-            #std_out = std_out.decode("utf-8")
-            #std_err = std_err.decode("utf-8")
+            std_out = std_out.decode("utf-8")
+            std_err = std_err.decode("utf-8")
                     
             if pipes.returncode == 0:
                 #Send output to notebook
@@ -602,9 +615,11 @@ class Apricot(Magics):
             else:
                 destroyCMD = ["ec3","destroy","-y"]
                 destroyCMD.extend(self.splitClear(userCMD))
-                pipes = subprocess.Popen( destroyCMD, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+                pipes = subprocess.Popen( destroyCMD, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 
                 std_out, std_err = pipes.communicate()
+                std_out = std_out.decode("utf-8")
+                std_err = std_err.decode("utf-8")
 
                 if pipes.returncode == 0:
                     #Send output to notebook
