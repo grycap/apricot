@@ -24,7 +24,7 @@ class Apricot(Magics):
 
         return list(filter(len,line.split(pattern)))
 
-    def multiparametricRun(self, clustername, queue, script, ranges, rangeID):
+    def multiparametricRun(self, execPath, clustername, queue, script, ranges, rangeID):
 
         if queue != "slurm":
             return "fail: only slurm queue system is allowed"
@@ -40,12 +40,12 @@ class Apricot(Magics):
             localScript = script.replace(identifier,str(value))
             if(rangeID == 0):
                 #print(localScript)
-                command = "exec " + clustername + " sbatch << " + localScript
+                command = "exec " + clustername + " cd " + execPath + " && sbatch << " + localScript
                 if self.apricot(command) != "done":
                     return "fail"
                 
             else:
-                self.multiparametricRun(clustername, queue, localScript, ranges, rangeID-1)
+                self.multiparametricRun(execPath, clustername, queue, localScript, ranges, rangeID-1)
             value += step
         return "done"
 
@@ -112,9 +112,11 @@ class Apricot(Magics):
         clusterName = words[0]
 
         #Get log
-        pipes = subprocess.Popen(["ec3","show","-r",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","show","-r",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         log, std_err = pipes.communicate()
+        log = log.decode('utf-8')
+        std_err = std_err.decode('utf-8')
 
         print(log)
 
@@ -210,8 +212,8 @@ class Apricot(Magics):
             
     @line_magic
     def apricot_runMP(self,line):
-        if len(line) == 0:
-            print("usage: runMP clustername script range1 range2...\n")
+        if len(line) < 4:
+            print("usage: runMP clustername script execution-path range1 range2...\n")
             print("range format is as follows: lowest highest step")
             return "fail"
         #Split line
@@ -223,8 +225,11 @@ class Apricot(Magics):
         #Get script name
         filename = words[1]
 
+        #Get execution path
+        execPath = words[2]        
+        
         #Extract ranges data
-        rangesDataString = words[2:]
+        rangesDataString = words[3:]
         rangesData = [float(i) for i in rangesDataString]
         
         #Check if last range is incomplete
@@ -272,13 +277,16 @@ class Apricot(Magics):
         # Add EOF at the beggining to introduce the script in command line
         script = "EOF \n" + script + "\nEOF\n"
 
-        return self.multiparametricRun(clusterName, "slurm", script, rangesData, nRanges-1)
+        return self.multiparametricRun(execPath, clusterName, "slurm", script, rangesData, nRanges-1)
         
     @line_magic
     def apricot_ls(self, line):
-        pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         std_out, std_err = pipes.communicate()
                     
+        std_out = std_out.decode('utf-8')
+        std_err = std_err.decode('utf-8')
+          
         if pipes.returncode == 0:
             #Send output to notebook
             print(std_out)
@@ -344,10 +352,13 @@ class Apricot(Magics):
             i = i+1
             
         #Get ssh instruction
-        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         ssh_instruct, std_err = pipes.communicate()
-    
+
+        ssh_instruct = ssh_instruct.decode('utf-8')
+        std_err = std_err.decode('utf-8')
+        
         if pipes.returncode == 0:        
             #Replace ssh by scp
             ssh_instruct = self.splitClear(ssh_instruct,'\n')[0]
@@ -394,11 +405,11 @@ class Apricot(Magics):
             scp_instruct.append(host)
             
             #Execute scp
-            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     
             std_out, std_err = pipes.communicate()
-            #std_out = std_out.decode("utf-8")
-            #std_err = std_err.decode("utf-8")
+            std_out = std_out.decode("utf-8")
+            std_err = std_err.decode("utf-8")
                     
             if pipes.returncode == 0:
                 #Send output to notebook
@@ -428,9 +439,11 @@ class Apricot(Magics):
         del words[len(words)-1]
         
         #Get ssh instruction
-        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        pipes = subprocess.Popen(["ec3","ssh","--show-only",clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         ssh_instruct, std_err = pipes.communicate()
+        ssh_instruct = ssh_instruct.decode("utf-8")
+        std_err = std_err.decode("utf-8")
     
         if pipes.returncode == 0:        
             #Replace ssh by scp
@@ -486,11 +499,11 @@ class Apricot(Magics):
             scp_instruct.append(destination)
 
             #Execute scp
-            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            pipes = subprocess.Popen(scp_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             std_out, std_err = pipes.communicate()
-            #std_out = std_out.decode("utf-8")
-            #std_err = std_err.decode("utf-8")
+            std_out = std_out.decode("utf-8")
+            std_err = std_err.decode("utf-8")
                     
             if pipes.returncode == 0:
                 #Send output to notebook
@@ -538,9 +551,11 @@ class Apricot(Magics):
                 clusterCMD = words[2:]
                 
                 #Get ssh instruction to execute on cluster
-                pipes = subprocess.Popen(["ec3","ssh","--show-only", clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+                pipes = subprocess.Popen(["ec3","ssh","--show-only", clusterName], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         
-                ssh_instruct, std_err = pipes.communicate()
+                ssh_instruct, std_err = pipes.communicate()                
+                ssh_instruct = ssh_instruct.decode("utf-8")
+                std_err = std_err.decode("utf-8")
 
                 if pipes.returncode == 0:
                         
@@ -548,14 +563,16 @@ class Apricot(Magics):
                     ssh_instruct = self.splitClear(ssh_instruct,"\n")[0]
                     ssh_instruct = self.splitClear(ssh_instruct)
                     ssh_instruct.extend(clusterCMD)
-                    pipes = subprocess.Popen(ssh_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+                    pipes = subprocess.Popen(ssh_instruct, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                     #Check if the call is asyncronous
                     if word1 == "execAsync":
                         return pipes
                     
                     std_out, std_err = pipes.communicate()
-
+                    std_out = std_out.decode("utf-8")
+                    std_err = std_err.decode("utf-8")
+                
                     if pipes.returncode == 0:
                         #Send output to notebook
                         print( std_out )
@@ -574,11 +591,11 @@ class Apricot(Magics):
                 
         elif word1 == "list":
                 
-            pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            pipes = subprocess.Popen(["ec3","list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     
             std_out, std_err = pipes.communicate()
-            #std_out = std_out.decode("utf-8")
-            #std_err = std_err.decode("utf-8")
+            std_out = std_out.decode("utf-8")
+            std_err = std_err.decode("utf-8")
                     
             if pipes.returncode == 0:
                 #Send output to notebook
@@ -598,9 +615,11 @@ class Apricot(Magics):
             else:
                 destroyCMD = ["ec3","destroy","-y"]
                 destroyCMD.extend(self.splitClear(userCMD))
-                pipes = subprocess.Popen( destroyCMD, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+                pipes = subprocess.Popen( destroyCMD, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 
                 std_out, std_err = pipes.communicate()
+                std_out = std_out.decode("utf-8")
+                std_err = std_err.decode("utf-8")
 
                 if pipes.returncode == 0:
                     #Send output to notebook

@@ -23,8 +23,8 @@ define([
     
     var queues = ["slurm"];
     var commonapps = ["openports"];
-    var applications = ["slurm","compilers","openmpi","nfs","sshkey","onedata"];
-    var localApplications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","openports"];
+    var applications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","git"];
+    var localApplications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","openports","git"];
 
     var templatesURL = "";
     var localTemplatePrefix = "__local_";
@@ -303,7 +303,7 @@ define([
             "MPI-Cluster": function() {
 		deployInfo.topology = "MPI-Cluster";
 		//Clear deploy apps selection
-		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata"];
+		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata","git"];
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		    
@@ -312,7 +312,7 @@ define([
             "Batch-Cluster": function() {
 		deployInfo.topology = "Batch-Cluster";
 		//Clear deploy apps selection
-		deployInfo.apps = ["nfs","sshkey","compilers","onedata"];
+		deployInfo.apps = ["nfs","sshkey","compilers","onedata","git"];
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		    

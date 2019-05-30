@@ -1,0 +1,20 @@
+description local_git (
+    kind = 'component' and
+    short = 'git client' and
+    content = 'Install git client'
+) 
+
+ 
+configure front(
+@begin
+---  
+  - tasks:
+    - name: Install git in Deb system
+      apt: pkg=git
+      when: ansible_os_family == "Debian"
+      
+    - name: Install git in RedHat system
+      yum: pkg=git
+      when: ansible_os_family == "RedHat"      
+@end
+)
