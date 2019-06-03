@@ -343,44 +343,53 @@ define([
  	    text: "Back",
 	    icon: "ui-icon-circle-arrow-w",
 	    showText: false,
-            click: state_Deploy_Mechanism
+        click: state_Deploy_Mechanism
 	   },   
-            "ONE": function() {
+       {
+        text: "ONE",
+        click: function() {
 
-		//Check if the provider has been changed
-		if(deployInfo.deploymentType != "OpenNebula"){
-		    clearDeployInfo();
-		}
-		
-		deployInfo.id = "one";
-		deployInfo.deploymentType = "OpenNebula";
-		
-		state_deploy_credentials();
-	    },
-            "EC2": function() {
+                //Check if the provider has been changed
+                if(deployInfo.deploymentType != "OpenNebula"){
+                    clearDeployInfo();
+                }
 
-		//Check if the provider has been changed
-		if(deployInfo.deploymentType != "EC2"){
-		    clearDeployInfo();
-		}
-		
-		deployInfo.id = "ec2";
-		deployInfo.deploymentType = "EC2";
-		
-		state_deploy_credentials();
-	    },
-            "OST": function() {
+                deployInfo.id = "one";
+                deployInfo.deploymentType = "OpenNebula";
 
-		//Check if the provider has been changed
-		if(deployInfo.deploymentType != "OpenStack"){
-		    clearDeployInfo();
-		}
-		
-		deployInfo.id = "ost";
-		deployInfo.deploymentType = "OpenStack";
-		
-		state_deploy_credentials();
-	    }
+                state_deploy_credentials();
+            }
+       },
+       {
+           text: "EC2",
+           click: function() {
+
+                //Check if the provider has been changed
+                if(deployInfo.deploymentType != "EC2"){
+                    clearDeployInfo();
+                }
+
+                deployInfo.id = "ec2";
+                deployInfo.deploymentType = "EC2";
+
+                state_deploy_credentials();
+            },
+       },
+       {
+            text: "OST",
+            click: function() {
+
+                //Check if the provider has been changed
+                if(deployInfo.deploymentType != "OpenStack"){
+                    clearDeployInfo();
+                }
+
+                deployInfo.id = "ost";
+                deployInfo.deploymentType = "OpenStack";
+
+                state_deploy_credentials();
+            }
+       }
         ]);
     }
 
