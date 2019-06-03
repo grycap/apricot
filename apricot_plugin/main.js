@@ -337,8 +337,14 @@ define([
         //Informative text
         deployDialog.append($("<p>Select infrastructure provider</p>"));
 	
-        deployDialog.dialog("option", "buttons",{
-            "Back": state_Deploy_Mechanism,
+        deployDialog.dialog("option", "buttons",
+	[
+	   {
+ 	    text: "Back",
+	    icon: "ui-icon-circle-arrow-w",
+	    showText: false,
+            click: state_Deploy_Mechanism
+	   },   
             "ONE": function() {
 
 		//Check if the provider has been changed
@@ -375,7 +381,7 @@ define([
 		
 		state_deploy_credentials();
 	    }
-        });
+        ]);
     }
 
     // introduce credentials function
