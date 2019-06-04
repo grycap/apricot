@@ -40,10 +40,12 @@ define([
 	}
         deployInfo = {
 	    "topology": "",
-            "user": "",
-            "credential": "",
-            "deploymentType": "OpenNebula",
+         "user": "",
+         "credential": "",
+         "deploymentType": "OpenNebula",
 	    "host": "",
+        "networkID": "",
+        "subnetID": "",
 	    "tenant": "",
 	    "id": "",
 	    "infName": "cluster-name",
@@ -423,7 +425,7 @@ define([
 	    text3 = "Password:<br>";
 
             //Create host input field
-            form.append("host:<br>");
+            form.append("host:port<br>");
             form.append($('<input id="hostIn" type="text" value="' + deployInfo.host + '" name="host"><br>'));
 	    
 	}
@@ -526,6 +528,14 @@ define([
         form.append("Worker instance type:<br>");
         form.append($('<input id="workerInstanceTypeIn" type="text" value="' + deployInfo.worker.instance + '" name="workerInstanceType"><br>'));
 
+        //Create VPC input field
+        form.append("VPC:<br>");
+        form.append($('<input id="networkIDIn" type="text" value="' + deployInfo.networkID + '" name="networkID"><br>'));	            
+        
+        //Create subnet input field
+        form.append("VPC Subnet:<br>");
+        form.append($('<input id="subnetIDIn" type="text" value="' + deployInfo.subnetID + '" name="subnetID"><br>'));	            
+        
         //Create image username input field
         form.append("Image username:<br>");
         form.append($('<input id="imageUserIn" type="text" value="' + deployInfo.frontend.user + '" name="imageUser"><br>'));	    
@@ -541,6 +551,9 @@ define([
 		var AWSzone = $("#availabilityZoneIn").val();
 		var AMI = $("#AMIIn").val();
 		var imageURL = "aws://" + AWSzone + "/" + AMI;
+
+        deployInfo.networkID = $("#networkIDIn").val();
+		deployInfo.subnetID = $("#subnetIDIn").val();
 		
 		//Frontend
 		deployInfo.frontend.instance = $("#frontendInstanceTypeIn").val();
@@ -1011,24 +1024,39 @@ define([
 	cmd += ")\n";
 	cmd += "\n";
 
+    //Network
+	if(obj.deploymentType == "EC2"){
+
+        //VPC
+        if(obj.networkID.length > 0 && obj.subnetID.length > 0){
+            
+            cmd += "network public ( \n";
+            cmd += "  provider_id = 'vpc-" + obj.networkID + ".subnet-" + obj.subnetID + "' \n ";
+            cmd += ")\n ";            
+        }
+    }
+        
 	//Frontend
 	cmd += "system front (\n ";
 
 	//cmd += "ec3_node_type = 'front' and\n ";
 	cmd += "disk.0.os.name = 'linux' and\n ";
 	
-	if(obj.deploymentType == "EC2"){
-	    cmd += "instance_type = '" + obj.frontend.instance + "' and\n";
-
+	if(obj.deploymentType == "EC2"){        
+        
 	    //Image url
 	    if(obj.frontend.image.length > 0){
 		cmd += "disk.0.image.url ='" + obj.frontend.image + "' and\n ";
 	    }
-
+        
 	    //Username
 	    if(obj.frontend.user.length > 0){
-		cmd += "disk.0.os.credentials.username = '" + obj.frontend.user + "'\n ";
+		cmd += "disk.0.os.credentials.username = '" + obj.frontend.user + "' and\n ";
 	    }
+
+        //Instance type
+	    cmd += "instance_type = '" + obj.frontend.instance + "'\n ";
+        
 	}
 	else if(obj.deploymentType == "OpenNebula"){
 	    
@@ -1069,17 +1097,20 @@ define([
 	cmd += "ec3_max_instances = " + obj.worker.maxNumber + " and\n ";
 
 	if(obj.deploymentType == "EC2"){
-	    cmd += "instance_type = '" + obj.worker.instance + "' and\n";
 
 	    //Image url
 	    if(obj.worker.image.length > 0){
 		cmd += "disk.0.image.url ='" + obj.worker.image + "' and\n ";
 	    }
-
+        
 	    //Username
 	    if(obj.worker.user.length > 0){
-		cmd += "disk.0.os.credentials.username = '" + obj.worker.user + "'\n ";
+		cmd += "disk.0.os.credentials.username = '" + obj.worker.user + "' and\n ";
 	    }
+
+        //Instance type
+	    cmd += "instance_type = '" + obj.worker.instance + "'\n ";
+        
 	}
 	else if(obj.deploymentType == "OpenNebula"){
 	    
