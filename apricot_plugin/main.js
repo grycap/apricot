@@ -1033,6 +1033,11 @@ define([
             cmd += "network public ( \n";
             cmd += "  provider_id = 'vpc-" + obj.networkID + ".subnet-" + obj.subnetID + "' \n ";
             cmd += ")\n ";            
+		
+            cmd += "network private ( \n";
+            cmd += "  provider_id = 'vpc-" + obj.networkID + ".subnet-" + obj.subnetID + "' \n ";
+            cmd += ")\n ";            
+		
         }
     }
         
