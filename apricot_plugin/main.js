@@ -61,8 +61,7 @@ define([
                 "credentials": "ubuntu"
             },
             "worker":{
-                "maxNumber": 1, // Maximum number of workers
-                "minNumber": 0, // Minimum number of workers
+                "minNumber": 1, // Minimum number of workers
                 "CPUs":1, //Minimum number of CPUs
 		"instance": "",
                 "memory": 1024, //in MB
@@ -882,19 +881,8 @@ define([
 		//Get specified information
 		deployInfo.infName = $("#clusterNameIn").val();
 		deployInfo.apps.push($("#queueSelector").val());
-		deployInfo.worker.maxNumber = $("#clusterNWorkersIn").val();
+		deployInfo.worker.minNumber = $("#clusterNWorkersIn").val();
 		deployInfo.destroyInterval = $("#destroyTimeIn").val();
-
-		//Set minimum number of workers
-		deployInfo.worker.minNumber = Math.round(deployInfo.worker.maxNumber/2)
-		
-		if(deployInfo.topology == "MPI-Cluster"){
-		    deployInfo.worker.minNumber = deployInfo.worker.maxNumber;
-		}
-
-		if(deployInfo.worker.minNumber > deployInfo.worker.maxNumber){
-		    deployInfo.worker.minNumber = deployInfo.worker.maxNumber;
-		}
 
 		if(deployInfo.worker.minNumber < 1){
 		    deployInfo.worker.minNumber = 1
@@ -1099,7 +1087,7 @@ define([
 	cmd += "system wn (\n ";
 	cmd += "ec3_node_type = 'wn' and\n ";
 	//cmd += "net_interface.0.connection = 'net'\n ";
-	cmd += "ec3_max_instances = " + obj.worker.maxNumber + " and\n ";
+	cmd += "ec3_max_instances = " + obj.worker.minNumber + " and\n ";
 
 	if(obj.deploymentType == "EC2"){
 
