@@ -528,11 +528,11 @@ define([
         form.append($('<input id="workerInstanceTypeIn" type="text" value="' + deployInfo.worker.instance + '" name="workerInstanceType"><br>'));
 
         //Create VPC input field
-        form.append("VPC:<br>");
+        form.append("VPC ID:<br>");
         form.append($('<input id="networkIDIn" type="text" value="' + deployInfo.networkID + '" name="networkID"><br>'));	            
         
         //Create subnet input field
-        form.append("VPC Subnet:<br>");
+        form.append("VPC Subnet ID:<br>");
         form.append($('<input id="subnetIDIn" type="text" value="' + deployInfo.subnetID + '" name="subnetID"><br>'));	            
         
         //Create image username input field
@@ -817,7 +817,7 @@ define([
         form.append($('<input id="clusterNameIn" type="text" value="' + deployInfo.infName + '" name="clusterName"><br>'));
 
 	//Maximum workers input field
-        form.append("Max workers:<br>");
+        form.append("Initial workers:<br>");
         form.append($('<input id="clusterNWorkersIn" type="number" value="1" min="1" name="clusterNWorkers"><br>'));
 	//Create workers destroy time input field
         form.append("Workers idle time (s) before shutdown:<br>");
