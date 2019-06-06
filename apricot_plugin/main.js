@@ -21,10 +21,10 @@ define([
     
     var prefix = "infrastructure-deployment";
     
-    var queues = ["slurm"];
+    var queues = ["slurm","OSCAR"];
     var commonapps = ["openports"];
-    var applications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","git"];
-    var localApplications = ["slurm","compilers","openmpi","nfs","sshkey","onedata","openports","git"];
+    var applications = ["compilers","openmpi","nfs","sshkey","onedata","git"];
+    var localApplications = ["compilers","openmpi","nfs","sshkey","onedata","openports","git"];
 
     var templatesURL = "";
     var localTemplatePrefix = "__local_";
@@ -73,7 +73,8 @@ define([
                 "credentials": "ubuntu",
             },
 	    "destroyInterval": 300,
-            "apps": apps
+            "apps": apps,
+	    "queue": ""
         }
     }
     
@@ -294,6 +295,7 @@ define([
         deployDialog.dialog("option", "buttons",{
             "Advanced": function() {
 		deployInfo.topology = "Advanced";
+		deployInfo.queue = "";
 		//Clear deploy apps selection
 		deployInfo.apps = [];
 		for(let i = 0; i < commonapps.length; i++){
@@ -304,6 +306,7 @@ define([
             "MPI-Cluster": function() {
 		deployInfo.topology = "MPI-Cluster";
 		//Clear deploy apps selection
+		deployInfo.queue = "slurm";
 		deployInfo.apps = ["nfs","sshkey","compilers","openmpi","onedata","git"];
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
@@ -313,12 +316,24 @@ define([
             "Batch-Cluster": function() {
 		deployInfo.topology = "Batch-Cluster";
 		//Clear deploy apps selection
+		deployInfo.queue = "slurm";
 		deployInfo.apps = ["nfs","sshkey","compilers","onedata","git"];
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		    
 		state_deploy_provider();
 	    }
+            "OSCAR": function() {
+		deployInfo.topology = "OSCAR";
+		deployInfo.queue = "OSCAR";
+		//Clear deploy apps selection
+		deployInfo.apps = [];
+		for(let i = 0; i < commonapps.length; i++){
+			deployInfo.apps.push(commonapps[i])
+		}
+		
+		state_deploy_provider();
+	    }		
         });
     }
     
@@ -817,16 +832,18 @@ define([
         form.append($('<input id="clusterNameIn" type="text" value="' + deployInfo.infName + '" name="clusterName"><br>'));
 
 	//Maximum workers input field
-        form.append("Initial workers:<br>");
+        form.append("Minimum workers:<br>");
         form.append($('<input id="clusterNWorkersIn" type="number" value="1" min="1" name="clusterNWorkers"><br>'));
 	//Create workers destroy time input field
         form.append("Workers idle time (s) before shutdown:<br>");
         form.append($('<input id="destroyTimeIn" type="number" value="' + deployInfo.destroyInterval + '" min="0" name="destroyTime"><br>'));
 	
-        form.append("Queue system:<br>");	
-	form.append(selector);
-
 	if(deployInfo.topology == "Advanced"){
+		
+	    //Queue selector
+	    form.append("Queue system:<br>");	
+	    form.append(selector);
+		
 	    //Create check boxes with optional app
 	    var ul = $('<ul class="checkbox-grid">');
 	    for(let i = 0; i < applications.length; i++){
@@ -869,21 +886,16 @@ define([
 		    return; //Deploy only one infrastructure at once
 		}
 		deploying = true;
-
-		//Remove queue systems from apps
-		for(let i = 0; i < queues.length; i++){
-		    var index = deployInfo.apps.indexOf(queues[i]);
-		    if(index > -1){
-			deployInfo.apps.splice(index,1);
-		    }
-		}
 		
 		//Get specified information
 		deployInfo.infName = $("#clusterNameIn").val();
-		deployInfo.apps.push($("#queueSelector").val());
 		deployInfo.worker.minNumber = $("#clusterNWorkersIn").val();
 		deployInfo.destroyInterval = $("#destroyTimeIn").val();
 
+		if(deployInfo.topology == "Advanced"){
+		    deployInfo.queue = $("#queueSelector").val();
+		}
+		    
 		if(deployInfo.worker.minNumber < 1){
 		    deployInfo.worker.minNumber = 1
 		}
@@ -1156,6 +1168,9 @@ define([
 		cmd += " " + obj.apps[i];
 	    }
 	}
+	//Add queue system
+	cmd += " __local_" + obj.queue;
+	    
 	cmd += " " + imageRADL + " --yes`\" \n";
 	//cmd += " --dry-run";
 
