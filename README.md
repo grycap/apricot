@@ -74,7 +74,7 @@ Deployment process include,
 
 ![Alt text](docs/images/deploySteps.png?raw=true "Deploy steps")
 
-If any error occurs during deployment, this will be shown in the web console. Also, it is possible to get cluster configuration logs using implemented magics functions.
+If any error occurs during deployment, this will be shown in the web console. Also, it is possible to get cluster configuration logs using implemented magics functions or get them directly using EC3 client via a terminal or bash magics into the notebook.
 
 ## Infrastructure management
 
