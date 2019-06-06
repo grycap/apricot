@@ -38,8 +38,16 @@ define([
 	if(typeof deployInfo.apps != undefined){
 	    apps = deployInfo.apps;
 	}
+    var topology = ""
+	if(typeof deployInfo.topology != undefined){
+	    topology = deployInfo.topology;
+    }    
+    var queue = ""
+	if(typeof deployInfo.queue != undefined){
+	    queue = deployInfo.queue;
+    }            
         deployInfo = {
-	    "topology": "",
+	    "topology": topology,
          "user": "",
          "credential": "",
          "deploymentType": "OpenNebula",
@@ -72,9 +80,9 @@ define([
 		"user": "ubuntu",
                 "credentials": "ubuntu",
             },
-	    "destroyInterval": 300,
+	    "destroyInterval": 3000,
             "apps": apps,
-	    "queue": ""
+	    "queue": queue
         }
     }
     
@@ -322,7 +330,7 @@ define([
 			deployInfo.apps.push(commonapps[i])
 		}		    
 		state_deploy_provider();
-	    }
+	    },
             "OSCAR": function() {
 		deployInfo.topology = "OSCAR";
 		deployInfo.queue = "OSCAR";
@@ -330,10 +338,10 @@ define([
 		deployInfo.apps = [];
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
-		}
-		
+		}		
 		state_deploy_provider();
-	    }		
+	    }
+    
         });
     }
     
@@ -828,15 +836,17 @@ define([
 	}
 
 	//Create cluster name input field
-        form.append("Cluster name:<br>");
-        form.append($('<input id="clusterNameIn" type="text" value="' + deployInfo.infName + '" name="clusterName"><br>'));
+    form.append("Cluster name:<br>");
+    form.append($('<input id="clusterNameIn" type="text" value="' + deployInfo.infName + '" name="clusterName"><br>'));
 
-	//Maximum workers input field
+    if(deployInfo.topology != "OSCAR"){
+        //Maximum workers input field
         form.append("Minimum workers:<br>");
         form.append($('<input id="clusterNWorkersIn" type="number" value="1" min="1" name="clusterNWorkers"><br>'));
-	//Create workers destroy time input field
+        //Create workers destroy time input field
         form.append("Workers idle time (s) before shutdown:<br>");
         form.append($('<input id="destroyTimeIn" type="number" value="' + deployInfo.destroyInterval + '" min="0" name="destroyTime"><br>'));
+    }
 	
 	if(deployInfo.topology == "Advanced"){
 		
@@ -996,6 +1006,12 @@ define([
 		    +  " > $PWD/templates/" + completeName + " \n";
 	    }
 	}
+        
+    //Get also queue radl
+    var completeName = localTemplatePrefix + obj.queue + ".radl";
+	cmd += "curl -s " + templateURL + "/"
+	    + completeName
+	    +  " > $PWD/templates/" + completeName + " \n";                
 
 	//Change "__MIN_NODES__" in local templates
 	cmd += "sed -i -e 's/__MIN_NODES__/" + obj.worker.minNumber + "/g' $PWD/templates/* \n";
@@ -1044,7 +1060,6 @@ define([
 	//Frontend
 	cmd += "system front (\n ";
 
-	//cmd += "ec3_node_type = 'front' and\n ";
 	cmd += "disk.0.os.name = 'linux' and\n ";
 	
 	if(obj.deploymentType == "EC2"){        
@@ -1067,29 +1082,29 @@ define([
 	    
 	    if(obj.frontend.arch.length > 0){
 		cmd += "cpu.arch = '" + obj.frontend.arch + "' and\n ";
-	    } else{
-		cmd += "cpu.arch = 'x86_64' and\n ";
 	    }
-	    cmd += "cpu.count >= " + obj.frontend.CPUs + " and\n ";
-	    cmd += "memory.size >= " + obj.frontend.memory + "m and\n ";
 	    if(obj.frontend.flavour.length > 0){
-		cmd += "disk.0.os.flavour = '" + obj.frontend.flavour + "' and\n ";
-	    } else {
-		cmd += "disk.0.os.flavour = 'ubuntu' and\n ";
+            cmd += "disk.0.os.flavour = '" + obj.frontend.flavour + "' and\n ";
 	    }
 	    if(obj.frontend.version.length > 0){
-		cmd += "disk.0.os.version >= '" + obj.frontend.version + "' and\n ";
-	    } else {
-		cmd += "disk.0.os.version >= '16.04' and\n ";	    
+            cmd += "disk.0.os.version >= '" + obj.frontend.version + "' and\n ";
 	    }
 	    if(obj.frontend.image.length > 0){
-		cmd += "disk.0.image.url ='" + obj.frontend.image + "'";
+            cmd += "disk.0.image.url ='" + obj.frontend.image + "' and\n ";
 	    }
 	    
-	    if(obj.frontend.credentials.length > 0){
-		cmd += " and\n disk.0.os.credentials.username = '" + obj.frontend.user + "'";
-		cmd += " and\n disk.0.os.credentials.password = '" + obj.frontend.credentials + "'";
-	    } //If no password has been provided, is supposed the use of contextualized image
+	    //Username
+	    if(obj.frontend.user.length > 0){
+            cmd += "disk.0.os.credentials.username = '" + obj.frontend.user + "' and\n ";
+        }
+        
+        if(obj.frontend.credentials.length > 0){
+            cmd += "disk.0.os.credentials.password = '" + obj.frontend.credentials + "' and\n ";
+	    }
+        
+	    cmd += "cpu.count >= " + obj.frontend.CPUs + " and\n ";
+	    cmd += "memory.size >= " + obj.frontend.memory + "m \n ";
+        
 	    cmd += "\n"
 	    
 	}
@@ -1098,19 +1113,24 @@ define([
 	//Workers
 	cmd += "system wn (\n ";
 	cmd += "ec3_node_type = 'wn' and\n ";
+    cmd += "disk.0.os.name ='linux' and\n ";
 	//cmd += "net_interface.0.connection = 'net'\n ";
-	cmd += "ec3_max_instances = " + obj.worker.minNumber + " and\n ";
+	
+    if(obj.topology != "OSCAR"){
+        cmd += "ec3_max_instances = " + obj.worker.minNumber + " and\n ";
+	    cmd += "ec3_destroy_interval = " + obj.destroyInterval + " and\n ";
+    }
 
 	if(obj.deploymentType == "EC2"){
 
 	    //Image url
 	    if(obj.worker.image.length > 0){
-		cmd += "disk.0.image.url ='" + obj.worker.image + "' and\n ";
+            cmd += "disk.0.image.url ='" + obj.worker.image + "' and\n ";
 	    }
         
 	    //Username
 	    if(obj.worker.user.length > 0){
-		cmd += "disk.0.os.credentials.username = '" + obj.worker.user + "' and\n ";
+            cmd += "disk.0.os.credentials.username = '" + obj.worker.user + "' and\n ";
 	    }
 
         //Instance type
@@ -1120,36 +1140,31 @@ define([
 	else if(obj.deploymentType == "OpenNebula"){
 	    
 	    if(obj.worker.arch.length > 0){
-		cmd += "cpu.arch = '" + obj.worker.arch + "' and\n ";
-	    } else{
-		cmd += "cpu.arch = 'x86_64' and\n ";
+            cmd += "cpu.arch = '" + obj.worker.arch + "' and\n ";
 	    }
-
-	    cmd += "ec3_destroy_interval = " + obj.destroyInterval + " and\n ";
-	    cmd += "cpu.count >= " + obj.worker.CPUs + " and\n ";
-	    cmd += "memory.size >=" + obj.worker.memory + "m and\n ";
-	    cmd += "disk.0.os.name ='linux' and\n ";
 
 	    if(obj.worker.flavour.length > 0){
-		cmd += "disk.0.os.flavour = '" + obj.worker.flavour + "' and\n ";
-	    } else {
-		cmd += "disk.0.os.flavour = 'ubuntu' and\n ";
+            cmd += "disk.0.os.flavour = '" + obj.worker.flavour + "' and\n ";
 	    }
 	    if(obj.worker.version.length > 0){
-		cmd += "disk.0.os.version >= '" + obj.worker.version + "' and\n ";
-	    } else {
-		cmd += "disk.0.os.version >= '16.04' and\n ";	    
+            cmd += "disk.0.os.version >= '" + obj.worker.version + "' and\n ";
 	    }
 	    if(obj.worker.image.length > 0){
-		cmd += "disk.0.image.url ='" + obj.worker.image + "'";
+            cmd += "disk.0.image.url ='" + obj.worker.image + "' and\n ";
 	    }
 	    
+        if(obj.worker.user.length > 0){
+            cmd += "disk.0.os.credentials.username = '" + obj.worker.user + "' and\n ";
+        }
+        
 	    if(obj.worker.credentials.length > 0){
-		cmd += " and\n disk.0.os.credentials.username = '" + obj.worker.user + "'";
-		cmd += " and\n disk.0.os.credentials.password = '" + obj.worker.credentials + "'";
-	    }//If no password has been provided, is supposed the use of contextualized image
+            cmd += "disk.0.os.credentials.password = '" + obj.worker.credentials + "' and\n ";
+	    }
 	    cmd += "\n"
-	    
+
+        cmd += "cpu.count >= " + obj.worker.CPUs + " and\n ";
+        cmd += "memory.size >=" + obj.worker.memory + "m \n ";
+        
 	}
 	
 	cmd += ")\n ";
@@ -1174,9 +1189,9 @@ define([
 	cmd += " " + imageRADL + " --yes`\" \n";
 	//cmd += " --dry-run";
 
-	//Remove pipe and radl
+	//Remove pipe
 	cmd += "rm $PWD/" + pipeAuth + " &> /dev/null \n";
-	cmd += "rm -r $PWD/templates &> /dev/null \n";
+	//cmd += "rm -r $PWD/templates &> /dev/null \n";
 
 	//Print ec3 output on stderr or stdout
 	cmd += "if [ $? -ne 0 ]; then \n";
