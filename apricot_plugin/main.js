@@ -40,10 +40,12 @@ define([
 	}
         deployInfo = {
 	    "topology": "",
-            "user": "",
-            "credential": "",
-            "deploymentType": "OpenNebula",
+         "user": "",
+         "credential": "",
+         "deploymentType": "OpenNebula",
 	    "host": "",
+        "networkID": "",
+        "subnetID": "",
 	    "tenant": "",
 	    "id": "",
 	    "infName": "cluster-name",
@@ -59,8 +61,7 @@ define([
                 "credentials": "ubuntu"
             },
             "worker":{
-                "maxNumber": 1, // Maximum number of workers
-                "minNumber": 0, // Minimum number of workers
+                "minNumber": 1, // Minimum number of workers
                 "CPUs":1, //Minimum number of CPUs
 		"instance": "",
                 "memory": 1024, //in MB
@@ -337,45 +338,60 @@ define([
         //Informative text
         deployDialog.append($("<p>Select infrastructure provider</p>"));
 	
-        deployDialog.dialog("option", "buttons",{
-            "Back": state_Deploy_Mechanism,
-            "ONE": function() {
+        deployDialog.dialog("option", "buttons",
+	[
+	   {
+ 	    text: "Back",
+	    icon: "ui-icon-circle-arrow-w",
+	    showText: false,
+        click: state_Deploy_Mechanism
+	   },   
+       {
+        text: "ONE",
+        click: function() {
 
-		//Check if the provider has been changed
-		if(deployInfo.deploymentType != "OpenNebula"){
-		    clearDeployInfo();
-		}
-		
-		deployInfo.id = "one";
-		deployInfo.deploymentType = "OpenNebula";
-		
-		state_deploy_credentials();
-	    },
-            "EC2": function() {
+                //Check if the provider has been changed
+                if(deployInfo.deploymentType != "OpenNebula"){
+                    clearDeployInfo();
+                }
 
-		//Check if the provider has been changed
-		if(deployInfo.deploymentType != "EC2"){
-		    clearDeployInfo();
-		}
-		
-		deployInfo.id = "ec2";
-		deployInfo.deploymentType = "EC2";
-		
-		state_deploy_credentials();
-	    },
-            "OST": function() {
+                deployInfo.id = "one";
+                deployInfo.deploymentType = "OpenNebula";
 
-		//Check if the provider has been changed
-		if(deployInfo.deploymentType != "OpenStack"){
-		    clearDeployInfo();
-		}
-		
-		deployInfo.id = "ost";
-		deployInfo.deploymentType = "OpenStack";
-		
-		state_deploy_credentials();
-	    }
-        });
+                state_deploy_credentials();
+            }
+       },
+       {
+           text: "EC2",
+           click: function() {
+
+                //Check if the provider has been changed
+                if(deployInfo.deploymentType != "EC2"){
+                    clearDeployInfo();
+                }
+
+                deployInfo.id = "ec2";
+                deployInfo.deploymentType = "EC2";
+
+                state_deploy_credentials();
+            },
+       },
+       {
+            text: "OST",
+            click: function() {
+
+                //Check if the provider has been changed
+                if(deployInfo.deploymentType != "OpenStack"){
+                    clearDeployInfo();
+                }
+
+                deployInfo.id = "ost";
+                deployInfo.deploymentType = "OpenStack";
+
+                state_deploy_credentials();
+            }
+       }
+        ]);
     }
 
     // introduce credentials function
@@ -408,7 +424,7 @@ define([
 	    text3 = "Password:<br>";
 
             //Create host input field
-            form.append("host:<br>");
+            form.append("host:port<br>");
             form.append($('<input id="hostIn" type="text" value="' + deployInfo.host + '" name="host"><br>'));
 	    
 	}
@@ -511,6 +527,14 @@ define([
         form.append("Worker instance type:<br>");
         form.append($('<input id="workerInstanceTypeIn" type="text" value="' + deployInfo.worker.instance + '" name="workerInstanceType"><br>'));
 
+        //Create VPC input field
+        form.append("VPC ID:<br>");
+        form.append($('<input id="networkIDIn" type="text" value="' + deployInfo.networkID + '" name="networkID"><br>'));	            
+        
+        //Create subnet input field
+        form.append("VPC Subnet ID:<br>");
+        form.append($('<input id="subnetIDIn" type="text" value="' + deployInfo.subnetID + '" name="subnetID"><br>'));	            
+        
         //Create image username input field
         form.append("Image username:<br>");
         form.append($('<input id="imageUserIn" type="text" value="' + deployInfo.frontend.user + '" name="imageUser"><br>'));	    
@@ -526,6 +550,9 @@ define([
 		var AWSzone = $("#availabilityZoneIn").val();
 		var AMI = $("#AMIIn").val();
 		var imageURL = "aws://" + AWSzone + "/" + AMI;
+
+        deployInfo.networkID = $("#networkIDIn").val();
+		deployInfo.subnetID = $("#subnetIDIn").val();
 		
 		//Frontend
 		deployInfo.frontend.instance = $("#frontendInstanceTypeIn").val();
@@ -790,7 +817,7 @@ define([
         form.append($('<input id="clusterNameIn" type="text" value="' + deployInfo.infName + '" name="clusterName"><br>'));
 
 	//Maximum workers input field
-        form.append("Max workers:<br>");
+        form.append("Initial workers:<br>");
         form.append($('<input id="clusterNWorkersIn" type="number" value="1" min="1" name="clusterNWorkers"><br>'));
 	//Create workers destroy time input field
         form.append("Workers idle time (s) before shutdown:<br>");
@@ -854,19 +881,8 @@ define([
 		//Get specified information
 		deployInfo.infName = $("#clusterNameIn").val();
 		deployInfo.apps.push($("#queueSelector").val());
-		deployInfo.worker.maxNumber = $("#clusterNWorkersIn").val();
+		deployInfo.worker.minNumber = $("#clusterNWorkersIn").val();
 		deployInfo.destroyInterval = $("#destroyTimeIn").val();
-
-		//Set minimum number of workers
-		deployInfo.worker.minNumber = Math.round(deployInfo.worker.maxNumber/2)
-		
-		if(deployInfo.topology == "MPI-Cluster"){
-		    deployInfo.worker.minNumber = deployInfo.worker.maxNumber;
-		}
-
-		if(deployInfo.worker.minNumber > deployInfo.worker.maxNumber){
-		    deployInfo.worker.minNumber = deployInfo.worker.maxNumber;
-		}
 
 		if(deployInfo.worker.minNumber < 1){
 		    deployInfo.worker.minNumber = 1
@@ -996,24 +1012,44 @@ define([
 	cmd += ")\n";
 	cmd += "\n";
 
+    //Network
+	if(obj.deploymentType == "EC2"){
+
+        //VPC
+        if(obj.networkID.length > 0 && obj.subnetID.length > 0){
+            
+            cmd += "network public ( \n";
+            cmd += "  provider_id = 'vpc-" + obj.networkID + ".subnet-" + obj.subnetID + "' \n ";
+            cmd += ")\n ";            
+		
+            cmd += "network private ( \n";
+            cmd += "  provider_id = 'vpc-" + obj.networkID + ".subnet-" + obj.subnetID + "' \n ";
+            cmd += ")\n ";            
+		
+        }
+    }
+        
 	//Frontend
 	cmd += "system front (\n ";
 
 	//cmd += "ec3_node_type = 'front' and\n ";
 	cmd += "disk.0.os.name = 'linux' and\n ";
 	
-	if(obj.deploymentType == "EC2"){
-	    cmd += "instance_type = '" + obj.frontend.instance + "' and\n";
-
+	if(obj.deploymentType == "EC2"){        
+        
 	    //Image url
 	    if(obj.frontend.image.length > 0){
 		cmd += "disk.0.image.url ='" + obj.frontend.image + "' and\n ";
 	    }
-
+        
 	    //Username
 	    if(obj.frontend.user.length > 0){
-		cmd += "disk.0.os.credentials.username = '" + obj.frontend.user + "'\n ";
+		cmd += "disk.0.os.credentials.username = '" + obj.frontend.user + "' and\n ";
 	    }
+
+        //Instance type
+	    cmd += "instance_type = '" + obj.frontend.instance + "'\n ";
+        
 	}
 	else if(obj.deploymentType == "OpenNebula"){
 	    
@@ -1051,20 +1087,23 @@ define([
 	cmd += "system wn (\n ";
 	cmd += "ec3_node_type = 'wn' and\n ";
 	//cmd += "net_interface.0.connection = 'net'\n ";
-	cmd += "ec3_max_instances = " + obj.worker.maxNumber + " and\n ";
+	cmd += "ec3_max_instances = " + obj.worker.minNumber + " and\n ";
 
 	if(obj.deploymentType == "EC2"){
-	    cmd += "instance_type = '" + obj.worker.instance + "' and\n";
 
 	    //Image url
 	    if(obj.worker.image.length > 0){
 		cmd += "disk.0.image.url ='" + obj.worker.image + "' and\n ";
 	    }
-
+        
 	    //Username
 	    if(obj.worker.user.length > 0){
-		cmd += "disk.0.os.credentials.username = '" + obj.worker.user + "'\n ";
+		cmd += "disk.0.os.credentials.username = '" + obj.worker.user + "' and\n ";
 	    }
+
+        //Instance type
+	    cmd += "instance_type = '" + obj.worker.instance + "'\n ";
+        
 	}
 	else if(obj.deploymentType == "OpenNebula"){
 	    
