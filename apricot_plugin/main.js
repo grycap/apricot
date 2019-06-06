@@ -72,7 +72,7 @@ define([
 		"user": "ubuntu",
                 "credentials": "ubuntu",
             },
-	    "destroyInterval": 300,
+	    "destroyInterval": 3000,
             "apps": apps
         }
     }
