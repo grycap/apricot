@@ -339,7 +339,8 @@ define([
 		for(let i = 0; i < commonapps.length; i++){
 			deployInfo.apps.push(commonapps[i])
 		}		
-		state_deploy_provider();
+		//state_deploy_provider();
+		console.log("on construction...");
 	    }
     
         });
