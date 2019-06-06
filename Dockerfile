@@ -8,7 +8,7 @@ USER root
 RUN apt-get update && apt-get install -y nano && apt-get install -y curl && apt-get install -y sshpass && \
     apt-get install -y python3 python2.7 && apt-get install -y python3-pip && apt-get install -y python-pip && \
     python3 -m pip install --upgrade pip && python2 -m pip install --upgrade pip && python3 -m pip install jupyter &&\
-    python2 -m pip install ec3-cli && apt-get install -y git
+    python2 -m pip install ec3-cli && apt-get install -y git && python3 -m pip install numpy scipy matplotlib
 
 # Create the script to init jupyter server
 RUN echo "#!/bin/bash" > /bin/jupyter-apricot && \

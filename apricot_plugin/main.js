@@ -81,8 +81,9 @@ define([
                 "credentials": "ubuntu",
             },
 	    "destroyInterval": 3000,
-            "apps": apps,
+      "apps": apps,
 	    "queue": queue
+
         }
     }
     
