@@ -70,6 +70,7 @@ define([
             },
             "worker":{
                 "minNumber": 1, // Minimum number of workers
+                "maxNumber": 1, // Minimum number of workers
                 "CPUs":1, //Minimum number of CPUs
 		"instance": "",
                 "memory": 1024, //in MB
@@ -842,9 +843,14 @@ define([
     form.append($('<input id="clusterNameIn" type="text" value="' + deployInfo.infName + '" name="clusterName"><br>'));
 
     if(deployInfo.topology != "OSCAR"){
-        //Maximum workers input field
+        //Minimum workers input field
         form.append("Minimum workers:<br>");
         form.append($('<input id="clusterNWorkersIn" type="number" value="1" min="1" name="clusterNWorkers"><br>'));
+
+	//Maximum workers input field
+        form.append("Maximum workers:<br>");
+        form.append($('<input id="clusterMaxWorkersIn" type="number" value="1" min="1" name="clusterMaxWorkers"><br>'));
+	    
         //Create workers destroy time input field
         form.append("Workers idle time (s) before shutdown:<br>");
         form.append($('<input id="destroyTimeIn" type="number" value="' + deployInfo.destroyInterval + '" min="0" name="destroyTime"><br>'));
@@ -902,6 +908,7 @@ define([
 		//Get specified information
 		deployInfo.infName = $("#clusterNameIn").val();
 		deployInfo.worker.minNumber = $("#clusterNWorkersIn").val();
+		deployInfo.worker.maxNumber = $("#clusterMaxWorkersIn").val();		    
 		deployInfo.destroyInterval = $("#destroyTimeIn").val();
 
 		if(deployInfo.topology == "Advanced"){
@@ -911,6 +918,11 @@ define([
 		if(deployInfo.worker.minNumber < 1){
 		    deployInfo.worker.minNumber = 1
 		}
+
+		if(deployInfo.worker.maxNumber < deployInfo.worker.minNumber){
+		    deployInfo.worker.maxNumber = deployInfo.worker.minNumber;
+		}
+		    
 
 		//Set applications
 		for(let i = 0; i < applications.length; i++){
@@ -1017,6 +1029,7 @@ define([
 
 	//Change "__MIN_NODES__" in local templates
 	cmd += "sed -i -e 's/__MIN_NODES__/" + obj.worker.minNumber + "/g' $PWD/templates/* \n";
+	cmd += "sed -i -e 's/__MAX_NODES__/" + obj.worker.maxNumber + "/g' $PWD/templates/* \n";	    
 	//Change "__USER_NAME__" in local templates
 	cmd += "sed -i -e 's/__USER_NAME__/" + userReplace + "/g' $PWD/templates/* \n";
 	
@@ -1119,7 +1132,7 @@ define([
 	//cmd += "net_interface.0.connection = 'net'\n ";
 	
     if(obj.topology != "OSCAR"){
-        cmd += "ec3_max_instances = " + obj.worker.minNumber + " and\n ";
+        cmd += "ec3_max_instances = " + obj.worker.maxNumber + " and\n ";
 	    cmd += "ec3_destroy_interval = " + obj.destroyInterval + " and\n ";
     }
 
