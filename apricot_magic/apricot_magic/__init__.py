@@ -132,6 +132,10 @@ class Apricot(Magics):
 
         #Split line
         words = self.splitClear(line)
+        if len(words) < 2:
+            print("usage: apricot_onedata clustername instruction parameters...\n")
+            print("Valid instructions are: mount, umount, download, upload, set-token, get-token, set-host, get-host")
+            return "fail"
 
         #Get cluster name
         clusterName = words[0]
@@ -210,14 +214,69 @@ class Apricot(Magics):
             print("Unknown instruction")
             return "fail"
             
+            
+    @line_magic
+    def apricot_MPI(self,line):
+
+        if len(line) == 0:
+            print("usage: apricot_MPI clustername node_number tasks_number remote/path/to/execute romete/path/to/executable arguments")
+            return "fail"
+
+        #Split line
+        words = self.splitClear(line)
+        
+        if len(words) < 5:
+            print("usage: apricot_MPI clustername node_number tasks_number remote/path/to/execute romete/path/to/executable arguments")
+            return "fail"
+        
+
+        #Get cluster name
+        clusterName = words[0]
+
+        #Get number of nodes to use
+        nodes2use = int(words[1])
+        if nodes2use <= 0:
+            print("Invalid node number")
+            return "fail"
+
+        #Get number of tasks to execute
+        ntasks = int(words[2])
+        if ntasks <= 0:
+            print("Invalid task number")
+            return "fail"
+        
+        #Get execution path
+        execPath = words[3]        
+        
+        #Get program path
+        executablePath = words[4]
+        
+        #Get arguments
+        arguments = ""
+        if len(line) > 5:
+            for word in words[5:]:
+                arguments += word
+        
+        command = "exec " + clusterName + " cd " + execPath + " && salloc -N " + str(nodes2use) + " mpirun -n " + str(ntasks) + " --mca btl_base_warn_component_unused 0 " + executablePath + " " + arguments
+        if self.apricot(command) != "done":
+            return "fail"        
+        return "done"
+
     @line_magic
     def apricot_runMP(self,line):
-        if len(line) < 4:
+
+        if len(line) == 0:
             print("usage: runMP clustername script execution-path range1 range2...\n")
             print("range format is as follows: lowest highest step")
             return "fail"
+
         #Split line
         words = self.splitClear(line)
+
+        if len(words) < 4:
+            print("usage: runMP clustername script execution-path range1 range2...\n")
+            print("range format is as follows: lowest highest step")
+            return "fail"
 
         #Get cluster name
         clusterName = words[0]
@@ -310,6 +369,22 @@ class Apricot(Magics):
 
         #send instruction
         return self.apricot("exec " + clusterName + " clues status")
+
+    @line_magic
+    def apricot_runOn(self, line):
+        if len(line) == 0:
+            return "fail"
+        words = self.splitClear(line)
+        if len(words) < 3:
+            print("usage: apricot_runOnAll clustername node-list command")
+            return "fail"
+            
+        #Get cluster name
+        clusterName = words[0]
+        nodeList = words[1]
+        command = ' '.join(words[2:])
+    
+        return self.apricot("exec " + clusterName + " srun -w " + nodeList + " " + command)
 
     @line_magic
     def apricot_upload(self, line):
